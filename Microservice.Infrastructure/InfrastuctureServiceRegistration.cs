@@ -26,7 +26,7 @@ namespace Microservice.Infrastructure
             services.AddScoped(typeof(IWriteRepository<>), typeof(RepositoryBase<>));
             services.AddScoped(typeof(IQueryRepository<>), typeof(RepositoryBase<>));
             services.AddScoped<IExampleRepository, ExampleRepository>();
-            services.AddScoped<IExampleUnitOfWork, ExampleUnitOfWork>();
+            services.AddScoped<IUnitOfWork, ExampleDbContext>();
 
             return services;
         }

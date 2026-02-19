@@ -9,21 +9,19 @@ namespace Microservice.Application.Features.Examples.Queries.GetExampleByPredica
 {
     public class GetExampleByPredicateQueryHandler(
         IExampleRepository exampleRepository,
-        IMapper mapper) : IRequestHandler<GetExampleByPredicateQuery, GetExampleByPredicateDto?>
+        IMapper mapper
+        ) : IRequestHandler<GetExampleByPredicateQuery, GetExampleByPredicateDto?>
     {
-        private readonly IExampleRepository _exampleRepository = exampleRepository;
-        private readonly IMapper _mapper = mapper;
-
         public async Task<GetExampleByPredicateDto?> Handle(GetExampleByPredicateQuery request, CancellationToken cancellationToken)
         {
             Expression<Func<Example, bool>> predicate = x => x.Id == request.Id;
 
-            var example = await _exampleRepository.GetEntityAsync(predicate, cancellationToken: cancellationToken);
+            var example = await exampleRepository.GetEntityAsync(predicate, cancellationToken: cancellationToken);
 
             if (example == null)
                 return null;
 
-            return _mapper.Map<GetExampleByPredicateDto>(example);
+            return mapper.Map<GetExampleByPredicateDto>(example);
         }
     }
 }

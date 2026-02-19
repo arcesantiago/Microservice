@@ -41,7 +41,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("DefaultCors");
 app.UseMiddleware<ExceptionMiddleware>();
-app.MapHealthChecks("/health");
+//app.MapHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

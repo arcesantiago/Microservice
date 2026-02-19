@@ -1,8 +1,7 @@
 ﻿namespace Microservice.Application.Contracts.Persistence
 {
-    public interface IExampleUnitOfWork : IDisposable
+    public interface IUnitOfWork
     {
-        IExampleRepository Examples { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

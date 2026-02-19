@@ -11,17 +11,14 @@ namespace ModularMonolith.Modules.Examples.Core.Features.Examples.Queries.GetExa
         IExampleRepository exampleRepository,
         IMapper mapper) : IRequestHandler<GetExamplesPaginatedQuery, PagedResult<GetExamplesPaginatedDto>>
     {
-        private readonly IExampleRepository _exampleRepository = exampleRepository;
-        private readonly IMapper _mapper = mapper;
-
         public async Task<PagedResult<GetExamplesPaginatedDto>> Handle(GetExamplesPaginatedQuery request, CancellationToken cancellationToken)
         {
-            var pagedResult = await _exampleRepository.GetListPaginatedAsync(
+            var pagedResult = await exampleRepository.GetListPaginatedAsync(
                 request.CurrentPage,
                 request.PageSize,
                 cancellationToken: cancellationToken);
 
-            var mappedResults = _mapper.Map<IEnumerable<GetExamplesPaginatedDto>>(pagedResult.Results);
+            var mappedResults = mapper.Map<IEnumerable<GetExamplesPaginatedDto>>(pagedResult.Results);
 
             return new PagedResult<GetExamplesPaginatedDto>(
                 mappedResults,

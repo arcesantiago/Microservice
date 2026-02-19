@@ -1,14 +1,15 @@
-﻿using Microservice.Domain.Common;
+﻿using Microservice.Application.Contracts.Persistence;
+using Microservice.Domain.Common;
 using Microservice.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Microservice.Infrastructure.Percistence
 {
-    public class ExampleDbContext(DbContextOptions<ExampleDbContext> options) : DbContext(options)
+    public class ExampleDbContext(DbContextOptions<ExampleDbContext> options) : DbContext(options), IUnitOfWork
     {
         public DbSet<Example>? Examples { get; set; }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public async override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             foreach (var entry in ChangeTracker.Entries<BaseDomainModel>())
             {
@@ -23,7 +24,7 @@ namespace Microservice.Infrastructure.Percistence
                         break;
                 }
             }
-            return base.SaveChangesAsync(cancellationToken);
+            return await base.SaveChangesAsync(cancellationToken);
         }
     }
 }
