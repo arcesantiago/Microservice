@@ -1,21 +1,26 @@
 ﻿using Microservice.Application.Common.Validation;
-using Microservice.Application.Contracts.Persistence.Read;
-using Microservice.Application.Contracts.Persistence.Write;
+using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.Models;
 using Microservice.Domain.Common;
+using Microservice.Infrastructure.Percistence;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace Microservice.Infrastructure.Repositories
+namespace Microservice.Infrastructure.Repositories.EF
 {
-    public class RepositoryBase<T>(DbContext context) :
+    /// <summary>
+    /// Repositorio EF (LINQ) - lectura/escritura/proyecciones
+    /// </summary>
+    public class LINQRepository<T>(ExampleDbContext context) :
         IReadRepository<T>,
         IWriteRepository<T>,
         IQueryRepository<T>
         where T : BaseDomainModel
     {
-        protected readonly DbContext _context = context;
+        protected readonly ExampleDbContext _context = context;
         protected readonly DbSet<T> _dbSet = context.Set<T>();
+
+        #region IReadRepository - Operaciones de lectura LINQ
 
         public async Task<T?> FindAsync(
             int id,
@@ -128,6 +133,24 @@ namespace Microservice.Infrastructure.Repositories
 
             return new PagedResult<T>(results, rowsCount, currentPage, pageSize);
         }
+
+        public async Task<bool> ExistsAsync(
+            Expression<Func<T, bool>> predicate,
+            CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.AnyAsync(predicate, cancellationToken);
+        }
+
+        public Task<int> CountAsync(
+            CancellationToken cancellationToken = default)
+        {
+            return _dbSet.CountAsync(cancellationToken);
+        }
+
+        #endregion
+
+        #region IWriteRepository - Operaciones de escritura LINQ
+
         public async Task<T> AddAsync(
             T entity,
             CancellationToken cancellationToken = default)
@@ -167,7 +190,8 @@ namespace Microservice.Infrastructure.Repositories
             return await updateAction(query);
         }
 
-        public void Delete(T entity)
+        public void Delete(
+            T entity)
         {
             _dbSet.Remove(entity);
         }
@@ -181,28 +205,42 @@ namespace Microservice.Infrastructure.Repositories
             .ExecuteDeleteAsync(cancellationToken);
         }
 
-        public async Task<IReadOnlyList<T>> FromSqlAsync(
-            FormattableString sql,
+        #endregion
+
+        #region IQueryRepository - Proyecciones LINQ
+
+        public async Task<IReadOnlyList<TResult>> GetListAsync<TResult>(
+            Expression<Func<T, TResult>> select,
+            Expression<Func<T, bool>>? predicate = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             CancellationToken cancellationToken = default)
         {
-            return await _dbSet
-            .FromSqlInterpolated(sql)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            IQueryable<T> query = _context.Set<T>().AsNoTracking();
+
+            if (predicate is not null)
+                query = query.Where(predicate);
+
+            if (orderBy is not null)
+                query = orderBy(query);
+
+            return await query.Select(select).ToListAsync(cancellationToken);
         }
 
-        public async Task<bool> ExistsAsync(
+        public async Task<TResult?> GetAsync<TResult>(
+            Expression<Func<T, TResult>> select,
             Expression<Func<T, bool>> predicate,
             CancellationToken cancellationToken = default)
         {
-            return await _dbSet.AnyAsync(predicate, cancellationToken);
+            return await _context.Set<T>()
+            .AsNoTracking()
+            .Where(predicate)
+            .Select(select)
+            .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public Task<int> CountAsync(
-            CancellationToken cancellationToken = default)
-        {
-            return _dbSet.CountAsync(cancellationToken);
-        }
+        #endregion
+
+        #region Helpers - Utilidades para Include
 
         private static string GetIncludePath(
             Expression<Func<T, object>> includeExpression)
@@ -250,33 +288,6 @@ namespace Microservice.Infrastructure.Repositories
             }
         }
 
-        public async Task<IReadOnlyList<TResult>> GetListAsync<TResult>(
-            Expression<Func<T, TResult>> select,
-            Expression<Func<T, bool>>? predicate = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-            CancellationToken cancellationToken = default)
-        {
-            IQueryable<T> query = _context.Set<T>().AsNoTracking();
-
-            if (predicate is not null)
-                query = query.Where(predicate);
-
-            if (orderBy is not null)
-                query = orderBy(query);
-
-            return await query.Select(select).ToListAsync(cancellationToken);
-        }
-
-        public async Task<TResult?> GetAsync<TResult>(
-            Expression<Func<T, TResult>> select,
-            Expression<Func<T, bool>> predicate,
-            CancellationToken cancellationToken = default)
-        {
-            return await _context.Set<T>()
-            .AsNoTracking()
-            .Where(predicate)
-            .Select(select)
-            .FirstOrDefaultAsync(cancellationToken);
-        }
+        #endregion
     }
 }

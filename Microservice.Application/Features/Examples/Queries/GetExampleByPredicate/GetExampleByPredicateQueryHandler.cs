@@ -1,6 +1,6 @@
 using AutoMapper;
 using MediatR;
-using Microservice.Application.Contracts.Persistence;
+using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.DTOs;
 using Microservice.Domain.Entities;
 using System.Linq.Expressions;
@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 namespace Microservice.Application.Features.Examples.Queries.GetExampleByPredicate
 {
     public class GetExampleByPredicateQueryHandler(
-        IExampleRepository exampleRepository,
+        IReadRepository<Example> readRepository,
         IMapper mapper
         ) : IRequestHandler<GetExampleByPredicateQuery, GetExampleByPredicateDto?>
     {
@@ -16,7 +16,7 @@ namespace Microservice.Application.Features.Examples.Queries.GetExampleByPredica
         {
             Expression<Func<Example, bool>> predicate = x => x.Id == request.Id;
 
-            var example = await exampleRepository.GetEntityAsync(predicate, cancellationToken: cancellationToken);
+            var example = await readRepository.GetEntityAsync(predicate, cancellationToken: cancellationToken);
 
             if (example == null)
                 return null;

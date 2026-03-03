@@ -12,6 +12,14 @@ namespace Microservice.Application.Mapping
 
             CreateMap<CreateExampleCommand, Example>()
                 .ConstructUsing(src => new Example(src.Id));
+
+            CreateMap<Example, GetExampleByIdDto>();
+            CreateMap<Example, GetExampleByPredicateDto>();
+            CreateMap<Example, GetExamplesFromSqlDto>();
+            CreateMap<Example, GetExamplesPaginatedDto>();
+            CreateMap<Example, GetExamplesWithProjectionDto>();
+            CreateMap<Example, GetExampleWithProjectionDto>();
+            CreateMap<Example, ExecuteSqlWithResultDto>();
         }
     }
 }

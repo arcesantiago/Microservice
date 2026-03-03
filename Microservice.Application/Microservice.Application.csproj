@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Microservice.Domain\Microservice.Domain.csproj" />
-    <ProjectReference Include="..\Microservice.Domain\Microservice.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

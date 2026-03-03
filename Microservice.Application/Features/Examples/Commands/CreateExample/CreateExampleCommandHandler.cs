@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microservice.Application.Contracts.Persistence;
+using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Domain.Entities;
 
 namespace Microservice.Application.Features.Examples.Commands.CreateExample
 {
     public class CreateExampleCommandHandler(
-        IExampleRepository exampleRepository,
+        IWriteRepository<Example> writeRepository,
         IUnitOfWork unitOfWork,
         IMapper mapper
         ) : IRequestHandler<CreateExampleCommand, int>
@@ -15,7 +16,7 @@ namespace Microservice.Application.Features.Examples.Commands.CreateExample
         {
             var example = mapper.Map<Example>(request);
 
-            await exampleRepository.AddAsync(example, cancellationToken);
+            await writeRepository.AddAsync(example, cancellationToken);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return example.Id;

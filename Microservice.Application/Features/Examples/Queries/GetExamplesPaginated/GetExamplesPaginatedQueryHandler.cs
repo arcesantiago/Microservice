@@ -1,19 +1,19 @@
 using AutoMapper;
 using MediatR;
-using Microservice.Application.Contracts.Persistence;
+using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.DTOs;
-using Microservice.Application.Features.Examples.Queries.GetExamplesPaginated;
 using Microservice.Application.Models;
+using Microservice.Domain.Entities;
 
-namespace ModularMonolith.Modules.Examples.Core.Features.Examples.Queries.GetExamplesPaginated
+namespace Microservice.Application.Features.Examples.Queries.GetExamplesPaginated
 {
     public class GetExamplesPaginatedQueryHandler(
-        IExampleRepository exampleRepository,
+        IReadRepository<Example> readRepository,
         IMapper mapper) : IRequestHandler<GetExamplesPaginatedQuery, PagedResult<GetExamplesPaginatedDto>>
     {
         public async Task<PagedResult<GetExamplesPaginatedDto>> Handle(GetExamplesPaginatedQuery request, CancellationToken cancellationToken)
         {
-            var pagedResult = await exampleRepository.GetListPaginatedAsync(
+            var pagedResult = await readRepository.GetListPaginatedAsync(
                 request.CurrentPage,
                 request.PageSize,
                 cancellationToken: cancellationToken);
