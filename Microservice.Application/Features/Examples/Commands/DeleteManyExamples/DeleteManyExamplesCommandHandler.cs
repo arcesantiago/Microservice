@@ -47,10 +47,7 @@ namespace Microservice.Application.Features.Examples.Commands.DeleteManyExamples
     {
         public async Task<Result<int>> Handle(DeleteManyExamplesCommand request, CancellationToken cancellationToken)
         {
-            Expression<Func<Example, bool>> predicate =
-                x => request.Ids.Contains(x.Id);
-
-            var deletedCount = await writeRepository.DeleteManyAsync(predicate, cancellationToken);
+            var deletedCount = await writeRepository.DeleteManyAsync(x => request.Ids.Contains(x.Id), cancellationToken);
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
