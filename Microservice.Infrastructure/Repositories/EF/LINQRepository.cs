@@ -226,7 +226,7 @@ namespace Microservice.Infrastructure.Repositories.EF
             return await query.Select(select).ToListAsync(cancellationToken);
         }
 
-        public async Task<TResult?> GetAsync<TResult>(
+        public async Task<TResult?> GetEntityAsync<TResult>(
             Expression<Func<T, TResult>> select,
             Expression<Func<T, bool>> predicate,
             CancellationToken cancellationToken = default)

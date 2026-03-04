@@ -1,5 +1,6 @@
 using AutoMapper;
 using MediatR;
+using Microservice.Application.Common.Results;
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.DTOs;
 using Microservice.Domain.Entities;
@@ -13,9 +14,9 @@ namespace Microservice.Application.Features.Examples.Queries.GetExamplesFromSql
     public class GetExamplesFromSqlQueryHandler(
         ISqlQueryRepository<Example> sqlQueryRepository,
         IMapper mapper
-        ) : IRequestHandler<GetExamplesFromSqlQuery, IEnumerable<GetExamplesFromSqlDto>>
+        ) : IRequestHandler<GetExamplesFromSqlQuery, Result<IEnumerable<GetExamplesFromSqlDto>>>
     {
-        public async Task<IEnumerable<GetExamplesFromSqlDto>> Handle(
+        public async Task<Result<IEnumerable<GetExamplesFromSqlDto>>> Handle(
             GetExamplesFromSqlQuery request, 
             CancellationToken cancellationToken)
         {
@@ -24,8 +25,9 @@ namespace Microservice.Application.Features.Examples.Queries.GetExamplesFromSql
             FormattableString sql = $"SELECT * FROM \"Examples\" WHERE \"Id\" > 0";
 
             var examples = await sqlQueryRepository.FromSqlAsync(sql, cancellationToken);
+            var data = mapper.Map<IEnumerable<GetExamplesFromSqlDto>>(examples);
 
-            return mapper.Map<IEnumerable<GetExamplesFromSqlDto>>(examples);
+            return Result<IEnumerable<GetExamplesFromSqlDto>>.Success(data);
         }
     }
 }

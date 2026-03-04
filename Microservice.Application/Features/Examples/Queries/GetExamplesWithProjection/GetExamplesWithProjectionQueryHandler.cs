@@ -1,4 +1,5 @@
 using MediatR;
+using Microservice.Application.Common.Results;
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.DTOs;
 using Microservice.Domain.Entities;
@@ -7,12 +8,12 @@ namespace Microservice.Application.Features.Examples.Queries.GetExamplesWithProj
 {
     public class GetExamplesWithProjectionQueryHandler(
         IQueryRepository<Example> queryRepository
-        ) : IRequestHandler<GetExamplesWithProjectionQuery, IEnumerable<GetExamplesWithProjectionDto>>
+        ) : IRequestHandler<GetExamplesWithProjectionQuery, Result<IEnumerable<GetExamplesWithProjectionDto>>>
     {
-        public async Task<IEnumerable<GetExamplesWithProjectionDto>> Handle(GetExamplesWithProjectionQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<GetExamplesWithProjectionDto>>> Handle(GetExamplesWithProjectionQuery request, CancellationToken cancellationToken)
         {
-
-            return await queryRepository.GetListAsync(x => new GetExamplesWithProjectionDto { Id = x.Id}, cancellationToken: cancellationToken);
+            var data = await queryRepository.GetListAsync(x => new GetExamplesWithProjectionDto { Id = x.Id}, cancellationToken: cancellationToken);
+            return Result<IEnumerable<GetExamplesWithProjectionDto>>.Success(data);
         }
     }
 }

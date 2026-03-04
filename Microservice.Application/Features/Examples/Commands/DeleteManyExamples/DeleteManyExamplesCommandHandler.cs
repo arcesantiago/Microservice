@@ -1,4 +1,5 @@
 using MediatR;
+using Microservice.Application.Common.Results;
 using Microservice.Application.Contracts.Persistence;
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Domain.Entities;
@@ -9,9 +10,9 @@ namespace Microservice.Application.Features.Examples.Commands.DeleteManyExamples
     public class DeleteManyExamplesCommandHandler(
         IWriteRepository<Example> writeRepository,
         IUnitOfWork unitOfWork
-        ) : IRequestHandler<DeleteManyExamplesCommand, int>
+        ) : IRequestHandler<DeleteManyExamplesCommand, Result<int>>
     {
-        public async Task<int> Handle(DeleteManyExamplesCommand request, CancellationToken cancellationToken)
+        public async Task<Result<int>> Handle(DeleteManyExamplesCommand request, CancellationToken cancellationToken)
         {
             Expression<Func<Example, bool>> predicate =
                 x => request.Ids.Contains(x.Id);
@@ -20,7 +21,7 @@ namespace Microservice.Application.Features.Examples.Commands.DeleteManyExamples
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return deletedCount;
+            return Result<int>.Success(deletedCount);
         }
     }
 }

@@ -1,7 +1,7 @@
 using MediatR;
+using Microservice.Application.Common.Results;
 using Microservice.Application.Contracts.Persistence;
 using Microservice.Application.Contracts.Persistence.EF;
-using Microservice.Application.Exceptions;
 using Microservice.Domain.Entities;
 
 namespace Microservice.Application.Features.Examples.Commands.DeleteExample
@@ -10,19 +10,19 @@ namespace Microservice.Application.Features.Examples.Commands.DeleteExample
         IReadRepository<Example> readRepository,
         IWriteRepository<Example> writeRepository,
         IUnitOfWork unitOfWork
-        ) : IRequestHandler<DeleteExampleCommand, int>
+        ) : IRequestHandler<DeleteExampleCommand, Result<int>>
     {
-        public async Task<int> Handle(DeleteExampleCommand request, CancellationToken cancellationToken)
+        public async Task<Result<int>> Handle(DeleteExampleCommand request, CancellationToken cancellationToken)
         {
             var example = await readRepository.FindAsync(request.Id, cancellationToken);
 
             if (example == null)
-                throw new NotFoundException(nameof(example), request.Id);
+                return Result<int>.Failure($"Ejemplo con id {request.Id} no encontrado");
 
             writeRepository.Delete(example);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return request.Id;
+            return Result<int>.Success(request.Id);
         }
     }
 }

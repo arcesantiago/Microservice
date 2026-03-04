@@ -1,5 +1,6 @@
 using AutoMapper;
 using MediatR;
+using Microservice.Application.Common.Results;
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.DTOs;
 using Microservice.Application.Models;
@@ -9,9 +10,9 @@ namespace Microservice.Application.Features.Examples.Queries.GetExamplesPaginate
 {
     public class GetExamplesPaginatedQueryHandler(
         IReadRepository<Example> readRepository,
-        IMapper mapper) : IRequestHandler<GetExamplesPaginatedQuery, PagedResult<GetExamplesPaginatedDto>>
+        IMapper mapper) : IRequestHandler<GetExamplesPaginatedQuery, Result<PagedResult<GetExamplesPaginatedDto>>>
     {
-        public async Task<PagedResult<GetExamplesPaginatedDto>> Handle(GetExamplesPaginatedQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PagedResult<GetExamplesPaginatedDto>>> Handle(GetExamplesPaginatedQuery request, CancellationToken cancellationToken)
         {
             var pagedResult = await readRepository.GetListPaginatedAsync(
                 request.CurrentPage,
@@ -20,11 +21,13 @@ namespace Microservice.Application.Features.Examples.Queries.GetExamplesPaginate
 
             var mappedResults = mapper.Map<IEnumerable<GetExamplesPaginatedDto>>(pagedResult.Results);
 
-            return new PagedResult<GetExamplesPaginatedDto>(
+            var result = new PagedResult<GetExamplesPaginatedDto>(
                 mappedResults,
                 pagedResult.RowsCount,
                 pagedResult.CurrentPage,
                 pagedResult.PageSize);
+
+            return Result<PagedResult<GetExamplesPaginatedDto>>.Success(result);
         }
     }
 }

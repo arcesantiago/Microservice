@@ -77,7 +77,7 @@ namespace Microservice.Application.Contracts.Persistence.EF
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             CancellationToken cancellationToken = default);
 
-        Task<TResult?> GetAsync<TResult>(
+        Task<TResult?> GetEntityAsync<TResult>(
             Expression<Func<T, TResult>> select,
             Expression<Func<T, bool>> predicate,
             CancellationToken cancellationToken = default);

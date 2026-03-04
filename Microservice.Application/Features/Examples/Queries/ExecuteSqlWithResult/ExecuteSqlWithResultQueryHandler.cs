@@ -1,5 +1,6 @@
 using AutoMapper;
 using MediatR;
+using Microservice.Application.Common.Results;
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.DTOs;
 using Microservice.Domain.Entities;
@@ -9,12 +10,13 @@ namespace Microservice.Application.Features.Examples.Queries.ExecuteSqlWithResul
     public class ExecuteSqlWithResultQueryHandler(
         ISqlQueryRepository<Example> sqlQueryRepository,
         IMapper mapper
-        ) : IRequestHandler<ExecuteSqlWithResultQuery, IReadOnlyList<ExecuteSqlWithResultDto>>
+        ) : IRequestHandler<ExecuteSqlWithResultQuery, Result<IReadOnlyList<ExecuteSqlWithResultDto>>>
     {
-        public async Task<IReadOnlyList<ExecuteSqlWithResultDto>> Handle(ExecuteSqlWithResultQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyList<ExecuteSqlWithResultDto>>> Handle(ExecuteSqlWithResultQuery request, CancellationToken cancellationToken)
         {
             var examples = await sqlQueryRepository.FromSqlAsync(request.Sql, cancellationToken);
-            return mapper.Map<IReadOnlyList<ExecuteSqlWithResultDto>>(examples);
+            var data = mapper.Map<IReadOnlyList<ExecuteSqlWithResultDto>>(examples);
+            return Result<IReadOnlyList<ExecuteSqlWithResultDto>>.Success(data);
         }
     }
 }
