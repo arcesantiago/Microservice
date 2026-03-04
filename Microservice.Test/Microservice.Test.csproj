@@ -38,10 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="API\Controllers\" />
     <Folder Include="Application\Behaviours\" />
     <Folder Include="Application\Handlers\" />
-    <Folder Include="Domain\Entities\" />
     <Folder Include="Infrastructure\Persistence\" />
     <Folder Include="Infrastructure\Services\" />
   </ItemGroup>
