@@ -13,6 +13,9 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
 
+// Add exception handling middleware (Modern .NET 10 approach using IExceptionHandler)
+app.UseExceptionHandler(_ => { });
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -47,4 +50,4 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();app.Run();
+app.Run();

@@ -1,15 +1,32 @@
-﻿using Microsoft.OpenApi;
+﻿using Microservice.API.Extensions;
+using Microsoft.OpenApi;
 
 namespace Microservice.API
 {
+    /// <summary>
+    /// API Services Registration
+    /// 
+    /// Configures:
+    /// - Controllers
+    /// - Swagger/OpenAPI
+    /// - Global Exception Handling
+    /// - Logging
+    /// - Configuration
+    /// </summary>
     public static class ApiRegistration
     {
-        public static IServiceCollection AddApiServices(this IServiceCollection services, IConfigurationBuilder configuration, IWebHostEnvironment hostEnvironment)
+        public static IServiceCollection AddApiServices(
+            this IServiceCollection services,
+            IConfigurationBuilder configuration,
+            IWebHostEnvironment hostEnvironment)
         {
-            // Add services to the container.
+            // Add services to the container
             services.AddControllers();
 
-            // Configurar Swagger/OpenAPI
+            // Register global exception handler (Modern .NET 10 approach)
+            services.AddGlobalExceptionHandler();
+
+            // Configure Swagger/OpenAPI
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
@@ -17,7 +34,7 @@ namespace Microservice.API
                 {
                     Title = "API",
                     Version = "v1",
-                    Description = "",
+                    Description = "Microservice API with CQRS pattern and Result error handling",
                     Contact = new OpenApiContact
                     {
                         Name = "",
@@ -25,7 +42,7 @@ namespace Microservice.API
                     }
                 });
 
-                // Incluir comentarios XML si los hay
+                // Include XML comments if they exist
                 var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 if (File.Exists(xmlPath))
@@ -35,8 +52,8 @@ namespace Microservice.API
             });
 
             configuration
-            .AddJsonFile($"appsettings.json", optional: true)
-            .AddJsonFile($"appsettings.{hostEnvironment.EnvironmentName}.json", optional: true);
+                .AddJsonFile($"appsettings.json", optional: true)
+                .AddJsonFile($"appsettings.{hostEnvironment.EnvironmentName}.json", optional: true);
 
             configuration.AddEnvironmentVariables();
 

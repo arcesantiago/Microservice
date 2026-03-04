@@ -27,12 +27,12 @@ public class Result
     /// <summary>
     /// List of errors if operation failed
     /// </summary>
-    public List<Error> Errors { get; protected set; } = new();
+    public List<Error> Errors { get; protected set; } = [];
 
     protected Result(bool isSuccess, List<Error>? errors = null)
     {
         IsSuccess = isSuccess;
-        Errors = errors ?? new List<Error>();
+        Errors = errors ?? [];
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class Result
     /// Create failed result with single error
     /// </summary>
     public static Result Failure(Error error) 
-        => new(false, new List<Error> { error });
+        => new(false, [error]);
 
     /// <summary>
     /// Create failed result with multiple errors
@@ -96,7 +96,7 @@ public class Result<T> : Result
     /// Create failed result with single error
     /// </summary>
     public static new Result<T> Failure(Error error) 
-        => new(false, errors: new List<Error> { error });
+        => new(false, errors: [error]);
 
     /// <summary>
     /// Create failed result with multiple errors

@@ -28,7 +28,6 @@ namespace Microservice.Application.Features.Examples.Queries.GetAllExample
     /// </summary>
     public class GetAllExamplesQueryHandler(
         IReadRepository<Example> readRepository,
-        IQueryRepository<Example> queryRepository,
         IMapper mapper
         ) : IRequestHandler<GetAllExamplesQuery, Result<IEnumerable<GetAllExamplesDto>>>
     {

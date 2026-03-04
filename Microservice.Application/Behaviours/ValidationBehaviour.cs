@@ -40,7 +40,7 @@ namespace Microservice.Application.Behaviours
                         .ToList();
 
                     // Try Result Pattern for Result<T> handlers
-                    if (TryReturnResultFailure(errors, out var resultFailure))
+                    if (ValidationBehaviour<TRequest, TResponse>.TryReturnResultFailure(errors, out var resultFailure))
                         return resultFailure;
 
                     // Fallback to exception for backward compatibility
@@ -54,7 +54,7 @@ namespace Microservice.Application.Behaviours
         /// <summary>
         /// Try to return Result.Failure() if TResponse is Result<T> or Result
         /// </summary>
-        private bool TryReturnResultFailure(List<Error> errors, out TResponse response)
+        private static bool TryReturnResultFailure(List<Error> errors, out TResponse response)
         {
             response = default!;
             var responseType = typeof(TResponse);
@@ -62,10 +62,10 @@ namespace Microservice.Application.Behaviours
             // Check if Result<T>
             if (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>))
             {
-                var method = responseType.GetMethod("Failure", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, new[] { typeof(List<Error>) }, null);
+                var method = responseType.GetMethod("Failure", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, null, [typeof(List<Error>)], null);
                 if (method != null)
                 {
-                    response = (TResponse)method.Invoke(null, new object[] { errors })!;
+                    response = (TResponse)method.Invoke(null, [errors])!;
                     return true;
                 }
             }

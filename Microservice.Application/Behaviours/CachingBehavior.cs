@@ -4,15 +4,9 @@ using Microservice.Application.Contracts.Infrastructure;
 
 namespace Microservice.Application.Behaviours
 {
-    public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class CachingBehavior<TRequest, TResponse>(ICacheService cache) : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
-        private readonly ICacheService _cache;
-
-        public CachingBehavior(ICacheService cache)
-        {
-            _cache = cache;
-        }
 
         public async Task<TResponse> Handle(
             TRequest request,
@@ -22,13 +16,13 @@ namespace Microservice.Application.Behaviours
             if (request is not ICacheableQuery cacheable)
                 return await next(cancellationToken);
 
-            var cached = await _cache.GetAsync<TResponse>(cacheable.CacheKey);
+            var cached = await cache.GetAsync<TResponse>(cacheable.CacheKey);
             if (cached is not null)
                 return cached;
 
             var response = await next(cancellationToken);
 
-            await _cache.SetAsync(
+            await cache.SetAsync(
                 cacheable.CacheKey,
                 response,
                 cacheable.Expiration ?? TimeSpan.FromMinutes(5));
