@@ -42,7 +42,7 @@ namespace Microservice.Application.Features.Examples.Queries.GetExampleById
             var example = await readRepository.FindAsync(request.Id, cancellationToken);
 
             if (example == null)
-                return Result<GetExampleByIdDto>.Failure("Ejemplo no encontrado");
+                return Result<GetExampleByIdDto>.Failure(Error.NotFound("Ejemplo no encontrado"));
 
             return Result<GetExampleByIdDto>.Success(mapper.Map<GetExampleByIdDto>(example));
         }

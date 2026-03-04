@@ -41,7 +41,7 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateExample
             var example = await readRepository.FindAsync(request.Id, cancellationToken);
 
             if (example == null)
-                return Result<int>.Failure($"Ejemplo con id {request.Id} no encontrado");
+                return Result<int>.Failure(Error.NotFound($"Ejemplo con id {request.Id} no encontrado"));
 
             writeRepository.Update(example);
             await unitOfWork.SaveChangesAsync(cancellationToken);

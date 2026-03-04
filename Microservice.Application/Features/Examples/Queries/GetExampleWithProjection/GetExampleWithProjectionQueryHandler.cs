@@ -51,7 +51,7 @@ namespace Microservice.Application.Features.Examples.Queries.GetExampleWithProje
             var data = await queryRepository.GetEntityAsync(x => new GetExampleWithProjectionDto { Id = x.Id}, x => x.Id == request.Id, cancellationToken);
             
             if (data == null)
-                return Result<GetExampleWithProjectionDto>.Failure("Ejemplo no encontrado");
+                return Result<GetExampleWithProjectionDto>.Failure(Error.NotFound("Ejemplo no encontrado"));
             
             return Result<GetExampleWithProjectionDto>.Success(data);
         }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microservice.API.Extensions;
 using Microservice.Application.Common.Results;
 using Microservice.Application.DTOs;
 using Microservice.Application.Features.Examples.Commands.CreateExample;
@@ -24,243 +25,384 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Microservice.API.Controllers
 {
+    /// <summary>
+    /// Examples API Controller
+    /// 
+    /// Use Case: REST API endpoints for CRUD and query operations
+    /// 
+    /// Pattern: CQRS with MediatR
+    /// - Commands: Create, Update, Delete
+    /// - Queries: Get, Count, Exists
+    /// - Advanced: ExecuteSql, ExecuteStoredProcedure, ExecuteInTransaction
+    /// 
+    /// Error Handling: Uses Result Pattern with ToActionResult() extension
+    /// - Success: Returns data with appropriate HTTP status
+    /// - Failure: Returns RFC 7807 ProblemDetails
+    /// 
+    /// Features:
+    /// - Automatic HTTP status mapping from error codes
+    /// - Support for single and batch operations
+    /// - Raw SQL and stored procedure execution
+    /// - Pagination support
+    /// - Field projection for optimized responses
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ExamplesController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
 
+        /// <summary>
+        /// POST /api/examples
+        /// Create a new Example
+        /// 
+        /// Returns: 201 Created with the new resource ID
+        /// Error: 400 Bad Request if validation fails
+        /// </summary>
         [HttpPost]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(Result), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Result<int>>> CreateExample(
+        [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateExample(
             [FromBody] CreateExampleCommand request,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(request, cancellationToken);
-            return result.IsSuccess
-                ? CreatedAtAction(nameof(GetExampleById), new { id = result.Data }, result)
-                : BadRequest(result);
+            return result.ToActionResult(StatusCodes.Status201Created);
         }
 
+        /// <summary>
+        /// GET /api/examples/{id}
+        /// Get Example by ID
+        /// 
+        /// Returns: 200 OK with Example data
+        /// Error: 404 Not Found if not exists
+        /// </summary>
         [HttpGet("{id:int}")]
-        [ProducesResponseType(typeof(Result<GetExampleByPredicateDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Result), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Result<GetExampleByPredicateDto>>> GetExampleById(
+        [ProducesResponseType(typeof(GetExampleByPredicateDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetExampleById(
             int id,
             CancellationToken cancellationToken)
         {
             var query = new GetExampleByPredicateQuery(id);
             var result = await _mediator.Send(query, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : NotFound(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// GET /api/examples?page=1&size=10
+        /// Get paginated Examples
+        /// 
+        /// Query Parameters:
+        /// - page: Page number (default: 1)
+        /// - size: Page size (default: 10)
+        /// 
+        /// Returns: 200 OK with PagedResult
+        /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(Result<PagedResult<GetExamplesPaginatedDto>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<PagedResult<GetExamplesPaginatedDto>>>> GetPaginated(
+        [ProducesResponseType(typeof(PagedResult<GetExamplesPaginatedDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPaginated(
             [FromQuery] int page = 1,
             [FromQuery] int size = 10,
             CancellationToken cancellationToken = default)
         {
             var query = new GetExamplesPaginatedQuery(page, size);
             var result = await _mediator.Send(query, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// GET /api/examples/all
+        /// Get all Examples
+        /// 
+        /// ⚠️ Warning: Returns all records (no pagination)
+        /// Use GetPaginated for large datasets
+        /// 
+        /// Returns: 200 OK with all Examples
+        /// </summary>
         [HttpGet("all")]
-        [ProducesResponseType(typeof(Result<IEnumerable<GetAllExamplesDto>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<IEnumerable<GetAllExamplesDto>>>> GetAllExamples(
+        [ProducesResponseType(typeof(IEnumerable<GetAllExamplesDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllExamples(
             CancellationToken cancellationToken = default)
         {
             var query = new GetAllExamplesQuery();
             var result = await _mediator.Send(query, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// GET /api/examples/count
+        /// Count all Examples
+        /// 
+        /// Use Case: Statistics, metrics, pagination calculations
+        /// 
+        /// Returns: 200 OK with total count
+        /// </summary>
         [HttpGet("count")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<int>>> CountExamples(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        public async Task<IActionResult> CountExamples(
             CancellationToken cancellationToken = default)
         {
             var query = new CountExamplesQuery();
             var result = await _mediator.Send(query, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// GET /api/examples/{id}/exists
+        /// Check if Example exists
+        /// 
+        /// Returns: 200 OK with boolean (true/false)
+        /// Performance: Optimized existence check (no data load)
+        /// </summary>
         [HttpGet("{id:int}/exists")]
-        [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<bool>>> ExistsExample(
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExistsExample(
             int id,
             CancellationToken cancellationToken)
         {
             var query = new ExistsExampleQuery(id);
             var result = await _mediator.Send(query, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// GET /api/examples/projection
+        /// Get Examples with field projection
+        /// 
+        /// Use Case: Lightweight responses with only needed fields
+        /// Performance: Reduced bandwidth (select specific columns only)
+        /// 
+        /// Returns: 200 OK with projected data
+        /// </summary>
         [HttpGet("projection")]
-        [ProducesResponseType(typeof(Result<IEnumerable<GetExamplesWithProjectionDto>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<IEnumerable<GetExamplesWithProjectionDto>>>> GetExamplesWithProjection(
+        [ProducesResponseType(typeof(IEnumerable<GetExamplesWithProjectionDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetExamplesWithProjection(
             CancellationToken cancellationToken = default)
         {
             var query = new GetExamplesWithProjectionQuery();
             var result = await _mediator.Send(query, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// GET /api/examples/{id}/projection
+        /// Get single Example with field projection
+        /// 
+        /// Use Case: Detail view with specific fields
+        /// 
+        /// Returns: 200 OK with projected data
+        /// Error: 404 Not Found
+        /// </summary>
         [HttpGet("{id:int}/projection")]
-        [ProducesResponseType(typeof(Result<GetExampleWithProjectionDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Result), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Result<GetExampleWithProjectionDto>>> GetExampleWithProjection(
+        [ProducesResponseType(typeof(GetExampleWithProjectionDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetExampleWithProjection(
             int id,
             CancellationToken cancellationToken)
         {
             var query = new GetExampleWithProjectionQuery(id);
             var result = await _mediator.Send(query, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : NotFound(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// GET /api/examples/from-sql?sql=...
+        /// Execute raw SQL SELECT query
+        /// 
+        /// Query Parameters:
+        /// - sql: FormattableString SQL query (parameterized)
+        /// 
+        /// ⚠️ Security: Only use pre-defined or AI-generated queries
+        /// Use Case: Complex analytical queries
+        /// 
+        /// Returns: 200 OK with query results
+        /// </summary>
         [HttpGet("from-sql")]
-        [ProducesResponseType(typeof(Result<IEnumerable<GetExamplesFromSqlDto>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<IEnumerable<GetExamplesFromSqlDto>>>> GetFromSql(
+        [ProducesResponseType(typeof(IEnumerable<GetExamplesFromSqlDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetFromSql(
             [FromQuery] string? sql = null,
             CancellationToken cancellationToken = default)
         {
             var query = new GetExamplesFromSqlQuery(sql ?? string.Empty);
             var result = await _mediator.Send(query, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// PUT /api/examples/{id}
+        /// Update entire Example
+        /// 
+        /// Use Case: Full entity replacement (PUT semantics)
+        /// 
+        /// Returns: 200 OK with updated ID
+        /// Error: 404 Not Found if not exists
+        /// </summary>
         [HttpPut("{id:int}")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Result), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Result<int>>> UpdateExample(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateExample(
             int id,
             CancellationToken cancellationToken)
         {
             var command = new UpdateExampleCommand(id);
             var result = await _mediator.Send(command, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : NotFound(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// PUT /api/examples/{id}/fields
+        /// Update specific fields only
+        /// 
+        /// Use Case: PATCH-style partial updates
+        /// Performance: Only modified columns in SQL
+        /// 
+        /// Returns: 200 OK with updated ID
+        /// Error: 404 Not Found if not exists
+        /// </summary>
         [HttpPut("{id:int}/fields")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Result), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Result<int>>> UpdateExampleFields(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateExampleFields(
             int id,
             CancellationToken cancellationToken)
         {
             var command = new UpdateExampleFieldsCommand(id);
             var result = await _mediator.Send(command, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : NotFound(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// PUT /api/examples/batch
+        /// Update multiple Examples in bulk
+        /// 
+        /// Body: JSON array of IDs
+        /// Example: [1, 2, 3, 4, 5]
+        /// 
+        /// Returns: 200 OK with count of updated records
+        /// </summary>
         [HttpPut("batch")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<int>>> UpdateManyExamples(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        public async Task<IActionResult> UpdateManyExamples(
             [FromBody] int[] ids,
             CancellationToken cancellationToken)
         {
             var command = new UpdateManyExamplesCommand(ids);
             var result = await _mediator.Send(command, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// DELETE /api/examples/{id}
+        /// Delete Example by ID
+        /// 
+        /// Returns: 200 OK with deleted ID
+        /// Error: 404 Not Found if not exists
+        /// </summary>
         [HttpDelete("{id:int}")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(Result), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Result<int>>> DeleteExample(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteExample(
             int id,
             CancellationToken cancellationToken)
         {
             var command = new DeleteExampleCommand(id);
             var result = await _mediator.Send(command, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : NotFound(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// DELETE /api/examples/batch
+        /// Delete multiple Examples in bulk
+        /// 
+        /// Body: JSON array of IDs
+        /// Example: [1, 2, 3, 4, 5]
+        /// 
+        /// Returns: 200 OK with count of deleted records
+        /// </summary>
         [HttpDelete("batch")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<int>>> DeleteManyExamples(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        public async Task<IActionResult> DeleteManyExamples(
             [FromBody] int[] ids,
             CancellationToken cancellationToken)
         {
             var command = new DeleteManyExamplesCommand(ids);
             var result = await _mediator.Send(command, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// POST /api/examples/execute-sql
+        /// Execute raw SQL command (INSERT, UPDATE, DELETE)
+        /// 
+        /// Body: { sql: "INSERT INTO ..." }
+        /// 
+        /// ⚠️ Security: Only use FormattableString for parameterization
+        /// Returns: 200 OK with affected row count
+        /// </summary>
         [HttpPost("execute-sql")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<int>>> ExecuteSql(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExecuteSql(
             [FromBody] ExecuteSqlCommand request,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(request, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// POST /api/examples/execute-stored-procedure
+        /// Execute database stored procedure
+        /// 
+        /// Body: { sql: "EXEC sp_StoredProcedureName ..." }
+        /// 
+        /// Use Case: Complex business logic in database
+        /// Returns: 200 OK with result
+        /// </summary>
         [HttpPost("execute-stored-procedure")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<int>>> ExecuteStoredProcedure(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExecuteStoredProcedure(
             [FromBody] ExecuteStoredProcedureCommand request,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(request, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// POST /api/examples/execute-sql-with-result
+        /// Execute raw SQL SELECT and get mapped results
+        /// 
+        /// Body: { sql: "SELECT * FROM ..." }
+        /// 
+        /// Returns: 200 OK with query results
+        /// </summary>
         [HttpPost("execute-sql-with-result")]
-        [ProducesResponseType(typeof(Result<IReadOnlyList<ExecuteSqlWithResultDto>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<IReadOnlyList<ExecuteSqlWithResultDto>>>> ExecuteSqlWithResult(
+        [ProducesResponseType(typeof(IReadOnlyList<ExecuteSqlWithResultDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExecuteSqlWithResult(
             [FromBody] ExecuteSqlWithResultQuery request,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(request, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
 
+        /// <summary>
+        /// POST /api/examples/execute-in-transaction
+        /// Execute multiple operations atomically
+        /// 
+        /// Use Case: Multi-step workflows with ACID guarantees
+        /// Returns: 200 OK with result
+        /// Error: 400 Bad Request if any step fails (full rollback)
+        /// </summary>
         [HttpPost("execute-in-transaction")]
-        [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Result<int>>> ExecuteInTransaction(
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ExecuteInTransaction(
             [FromBody] ExecuteInTransactionCommand request,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(request, cancellationToken);
-            return result.IsSuccess
-                ? Ok(result)
-                : BadRequest(result);
+            return result.ToActionResult();
         }
     }
 }
