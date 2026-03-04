@@ -15,6 +15,7 @@ namespace Microservice.Application.Mapping
 
             CreateMap<Example, GetExampleByIdDto>();
             CreateMap<Example, GetExampleByPredicateDto>();
+            CreateMap<Example, GetAllExamplesDto>();
             CreateMap<Example, GetExamplesFromSqlDto>();
             CreateMap<Example, GetExamplesPaginatedDto>();
             CreateMap<Example, GetExamplesWithProjectionDto>();
