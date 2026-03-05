@@ -32,18 +32,21 @@ namespace Microservice.Test.Application.DTOs
         }
 
         [Fact]
-        public void DTO_ShouldAllowNullUpdatedAt()
+        public void DTO_ShouldInitializeNameAndDescription()
         {
             // Act
             var dto = new GetExampleByIdDto
             {
                 Id = 1,
+                Name = "Test",
+                Description = "Description",
                 CreatedAt = DateTimeOffset.UtcNow,
-                UpdatedAt = null
+                UpdatedAt = DateTimeOffset.UtcNow
             };
 
             // Assert
-            dto.UpdatedAt.Should().BeNull();
+            dto.Name.Should().Be("Test");
+            dto.Description.Should().Be("Description");
         }
 
         [Theory]
@@ -78,7 +81,7 @@ namespace Microservice.Test.Application.DTOs
         }
 
         [Fact]
-        public void DTO_ShouldAllowCreatedBeforeUpdated()
+        public void DTO_ShouldAllowCreatedBeforeUpdatedAt()
         {
             // Arrange
             var createdAt = DateTimeOffset.UtcNow.AddDays(-1);
@@ -92,7 +95,7 @@ namespace Microservice.Test.Application.DTOs
             };
 
             // Assert
-            dto.CreatedAt.Should().BeBefore(dto.UpdatedAt.Value);
+            dto.CreatedAt.Should().BeBefore(dto.UpdatedAt);
         }
     }
 
@@ -121,16 +124,21 @@ namespace Microservice.Test.Application.DTOs
         }
 
         [Fact]
-        public void DTO_ShouldAllowNullUpdatedAt()
+        public void DTO_ShouldInitializeNameAndDescription()
         {
             // Act
             var dto = new GetExampleByPredicateDto
             {
-                UpdatedAt = null
+                Id = 1,
+                Name = "Test",
+                Description = "Description",
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
             };
 
             // Assert
-            dto.UpdatedAt.Should().BeNull();
+            dto.Name.Should().Be("Test");
+            dto.Description.Should().Be("Description");
         }
 
         [Theory]

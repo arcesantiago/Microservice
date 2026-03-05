@@ -1,14 +1,12 @@
 using Microservice.API;
 using Microservice.Application;
 using Microservice.Infrastructure;
-using Microservice.Infrastructure.Percistence;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Registrar servicios de aplicación e infraestructura
 builder.Services.AddApiServices(builder.Configuration, builder.Environment);
-builder.Services.AddAplicationServices();
+builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();

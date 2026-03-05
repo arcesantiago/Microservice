@@ -1,6 +1,6 @@
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Domain.Common;
-using Microservice.Infrastructure.Percistence;
+using Microservice.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Microservice.Infrastructure.Repositories.EF

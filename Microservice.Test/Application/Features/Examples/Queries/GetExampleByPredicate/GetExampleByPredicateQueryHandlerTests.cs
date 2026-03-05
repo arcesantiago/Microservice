@@ -32,7 +32,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         {
             // Arrange
             var query = new GetExampleByPredicateQuery(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
             var dto = new GetExampleByPredicateDto { Id = 1 };
 
             _mockReadRepository
@@ -85,7 +85,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         {
             // Arrange
             var query = new GetExampleByPredicateQuery(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -122,7 +122,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         {
             // Arrange
             var query = new GetExampleByPredicateQuery(id);
-            var example = new Example(id);
+            var example = new Example("Test", "Description") { Id = id };
             var dto = new GetExampleByPredicateDto { Id = id };
 
             _mockReadRepository
@@ -151,7 +151,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         {
             // Arrange
             var query = new GetExampleByPredicateQuery(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockReadRepository

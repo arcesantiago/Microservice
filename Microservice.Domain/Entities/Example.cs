@@ -1,18 +1,21 @@
-﻿using Microservice.Domain.Common;
+using Microservice.Domain.Common;
 
 namespace Microservice.Domain.Entities
 {
     public class Example : BaseDomainModel
     {
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
 
         private Example() { }
 
-        public Example(int id)
+        public Example(string name, string? description)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Name is required.", nameof(name));
 
-            if (id <= 0)
-                throw new ArgumentException("Id must be greater than 0.", nameof(Id));
-
+            Name = name.Trim();
+            Description = description?.Trim();
             CreatedAt = DateTimeOffset.UtcNow;
             UpdatedAt = DateTimeOffset.UtcNow;
         }

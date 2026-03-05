@@ -35,8 +35,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_WithExistingId_ShouldUpdateAndReturnSuccess()
         {
             // Arrange
-            var command = new UpdateExampleCommand(1);
-            var example = new Example(1);
+            var command = new UpdateExampleCommand(1, "Updated Name", "Updated Description");
+            var example = new Example("Test", "Description");
+            example.Id = 1;
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -64,7 +65,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_WithNonExistentId_ShouldReturnFailure()
         {
             // Arrange
-            var command = new UpdateExampleCommand(999);
+            var command = new UpdateExampleCommand(999, null, null);
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(999, It.IsAny<CancellationToken>()))
@@ -84,8 +85,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_ShouldCallFindAsyncWithCorrectId()
         {
             // Arrange
-            var command = new UpdateExampleCommand(5);
-            var example = new Example(5);
+            var command = new UpdateExampleCommand(5, null, null);
+            var example = new Example("Test", "Description");
+            example.Id = 5;
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(5, It.IsAny<CancellationToken>()))
@@ -102,8 +104,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_ShouldCallUpdateWithCorrectExample()
         {
             // Arrange
-            var command = new UpdateExampleCommand(1);
-            var example = new Example(1);
+            var command = new UpdateExampleCommand(1, "New Name", null);
+            var example = new Example("Test", "Description");
+            example.Id = 1;
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -120,8 +123,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_ShouldSaveChangesAfterUpdate()
         {
             // Arrange
-            var command = new UpdateExampleCommand(1);
-            var example = new Example(1);
+            var command = new UpdateExampleCommand(1, null, "New Description");
+            var example = new Example("Test", "Description");
+            example.Id = 1;
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -143,8 +147,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_WithDifferentIds_ShouldReturnCorrectId(int id)
         {
             // Arrange
-            var command = new UpdateExampleCommand(id);
-            var example = new Example(id);
+            var command = new UpdateExampleCommand(id, null, null);
+            var example = new Example("Test", "Description");
+            example.Id = id;
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(id, It.IsAny<CancellationToken>()))
@@ -162,8 +167,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_ShouldRespectCancellationToken()
         {
             // Arrange
-            var command = new UpdateExampleCommand(1);
-            var example = new Example(1);
+            var command = new UpdateExampleCommand(1, null, null);
+            var example = new Example("Test", "Description");
+            example.Id = 1;
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockReadRepository
@@ -183,7 +189,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_WhenRepositoryThrows_ShouldPropagateException()
         {
             // Arrange
-            var command = new UpdateExampleCommand(1);
+            var command = new UpdateExampleCommand(1, null, null);
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -198,8 +204,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_WhenSaveChangesThrows_ShouldPropagateException()
         {
             // Arrange
-            var command = new UpdateExampleCommand(1);
-            var example = new Example(1);
+            var command = new UpdateExampleCommand(1, null, null);
+            var example = new Example("Test", "Description");
+            example.Id = 1;
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -218,7 +225,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_WithNonExistentId_ShouldNotUpdateEntity()
         {
             // Arrange
-            var command = new UpdateExampleCommand(999);
+            var command = new UpdateExampleCommand(999, null, null);
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(999, It.IsAny<CancellationToken>()))
@@ -236,7 +243,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.UpdateExample
         public async Task Handle_ShouldReturnErrorMessage_WhenNotFound()
         {
             // Arrange
-            var command = new UpdateExampleCommand(999);
+            var command = new UpdateExampleCommand(999, null, null);
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(999, It.IsAny<CancellationToken>()))

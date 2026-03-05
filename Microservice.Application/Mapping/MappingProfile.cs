@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microservice.Application.DTOs;
 using Microservice.Application.Features.Examples.Commands.CreateExample;
 using Microservice.Domain.Entities;
@@ -11,7 +11,7 @@ namespace Microservice.Application.Mapping
         {
 
             CreateMap<CreateExampleCommand, Example>()
-                .ConstructUsing(src => new Example(src.Id));
+                .ConstructUsing(src => new Example(src.Name, src.Description));
 
             CreateMap<Example, GetExampleByIdDto>();
             CreateMap<Example, GetExampleByPredicateDto>();

@@ -2,7 +2,7 @@
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.Models;
 using Microservice.Domain.Common;
-using Microservice.Infrastructure.Percistence;
+using Microservice.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

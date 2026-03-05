@@ -34,9 +34,9 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetAllExample
             var query = new GetAllExamplesQuery();
             var examples = new List<Example>
             {
-                new Example(1),
-                new Example(2),
-                new Example(3)
+                new Example("Test1", "Desc1") { Id = 1 },
+                new Example("Test2", "Desc2") { Id = 2 },
+                new Example("Test3", "Desc3") { Id = 3 }
             };
             var dtos = new List<GetAllExamplesDto>();
 
@@ -132,7 +132,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetAllExample
         {
             // Arrange
             var query = new GetAllExamplesQuery();
-            var examples = new List<Example> { new Example(1) };
+            var examples = new List<Example> { new Example("Test", "Description") { Id = 1 } };
 
             _mockReadRepository
                 .Setup(r => r.GetListAsync(
@@ -220,7 +220,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetAllExample
             // Arrange
             var query = new GetAllExamplesQuery();
             var examples = Enumerable.Range(1, 1000)
-                .Select(i => new Example(i))
+                .Select(i => new Example($"Test{i}", "Description") { Id = i })
                 .ToList();
             var dtos = new List<GetAllExamplesDto>();
 

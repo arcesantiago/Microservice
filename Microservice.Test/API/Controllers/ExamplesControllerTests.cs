@@ -5,7 +5,7 @@ using Microservice.API.Controllers;
 using Microservice.Application.Common.Results;
 using Microservice.Application.DTOs;
 using Microservice.Application.Features.Examples.Commands.CreateExample;
-using Microservice.Application.Features.Examples.Queries.GetExampleById;
+using Microservice.Application.Features.Examples.Queries.GetExampleByPredicate;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Microservice.Test.API.Controllers
@@ -29,7 +29,7 @@ namespace Microservice.Test.API.Controllers
         public async Task CreateExample_WithValidCommand_ShouldReturnCreatedResult()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
+            var command = new CreateExampleCommand("Test", "Description");
             var expectedId = 1;
 
             _mockMediator
@@ -50,7 +50,7 @@ namespace Microservice.Test.API.Controllers
         public async Task CreateExample_ShouldSendCommandToMediator()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
+            var command = new CreateExampleCommand("Test", "Description");
 
             _mockMediator
                 .Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
@@ -72,7 +72,7 @@ namespace Microservice.Test.API.Controllers
         public async Task CreateExample_WithDifferentIds_ShouldReturnCorrectId(int id)
         {
             // Arrange
-            var command = new CreateExampleCommand(id);
+            var command = new CreateExampleCommand("Test", "Description");
 
             _mockMediator
                 .Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
@@ -92,12 +92,11 @@ namespace Microservice.Test.API.Controllers
         {
             // Arrange
             var id = 1;
-            var expectedDto = new GetExampleByPredicateDto { Id = id };
 
             _mockMediator
-                .Setup(m => m.Send(It.IsAny<GetExampleByIdQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Result<GetExampleByIdDto>.Success(
-                    new GetExampleByIdDto { Id = id }));
+                .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result<GetExampleByPredicateDto>.Success(
+                    new GetExampleByPredicateDto { Id = id }));
 
             // Act
             var result = await _controller.GetExampleById(id, CancellationToken.None);
@@ -116,16 +115,16 @@ namespace Microservice.Test.API.Controllers
             var id = 1;
 
             _mockMediator
-                .Setup(m => m.Send(It.IsAny<GetExampleByIdQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Result<GetExampleByIdDto>.Success(
-                    new GetExampleByIdDto { Id = id }));
+                .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result<GetExampleByPredicateDto>.Success(
+                    new GetExampleByPredicateDto { Id = id }));
 
             // Act
             await _controller.GetExampleById(id, CancellationToken.None);
 
             // Assert
             _mockMediator.Verify(
-                m => m.Send(It.Is<GetExampleByIdQuery>(q => q.Id == id), It.IsAny<CancellationToken>()),
+                m => m.Send(It.Is<GetExampleByPredicateQuery>(q => q.Id == id), It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
@@ -134,11 +133,11 @@ namespace Microservice.Test.API.Controllers
         {
             // Arrange
             var id = 999;
-            var failureResult = Result<GetExampleByIdDto>.Failure(
+            var failureResult = Result<GetExampleByPredicateDto>.Failure(
                 Error.NotFound("Ejemplo no encontrado"));
 
             _mockMediator
-                .Setup(m => m.Send(It.IsAny<GetExampleByIdQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(failureResult);
 
             // Act
@@ -159,16 +158,16 @@ namespace Microservice.Test.API.Controllers
         {
             // Arrange
             _mockMediator
-                .Setup(m => m.Send(It.IsAny<GetExampleByIdQuery>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Result<GetExampleByIdDto>.Success(
-                    new GetExampleByIdDto { Id = id }));
+                .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Result<GetExampleByPredicateDto>.Success(
+                    new GetExampleByPredicateDto { Id = id }));
 
             // Act
             await _controller.GetExampleById(id, CancellationToken.None);
 
             // Assert
             _mockMediator.Verify(
-                m => m.Send(It.Is<GetExampleByIdQuery>(q => q.Id == id), It.IsAny<CancellationToken>()),
+                m => m.Send(It.Is<GetExampleByPredicateQuery>(q => q.Id == id), It.IsAny<CancellationToken>()),
                 Times.Once);
         }
 
@@ -176,7 +175,7 @@ namespace Microservice.Test.API.Controllers
         public async Task CreateExample_ShouldRespectCancellationToken()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
+            var command = new CreateExampleCommand("Test", "Description");
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockMediator
@@ -200,16 +199,16 @@ namespace Microservice.Test.API.Controllers
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockMediator
-                .Setup(m => m.Send(It.IsAny<GetExampleByIdQuery>(), cancellationToken))
-                .ReturnsAsync(Result<GetExampleByIdDto>.Success(
-                    new GetExampleByIdDto { Id = id }));
+                .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), cancellationToken))
+                .ReturnsAsync(Result<GetExampleByPredicateDto>.Success(
+                    new GetExampleByPredicateDto { Id = id }));
 
             // Act
             await _controller.GetExampleById(id, cancellationToken);
 
             // Assert
             _mockMediator.Verify(
-                m => m.Send(It.IsAny<GetExampleByIdQuery>(), cancellationToken),
+                m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), cancellationToken),
                 Times.Once);
         }
 
@@ -217,7 +216,7 @@ namespace Microservice.Test.API.Controllers
         public async Task CreateExample_WhenMediatorThrows_ShouldPropagateException()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
+            var command = new CreateExampleCommand("Test", "Description");
 
             _mockMediator
                 .Setup(m => m.Send(command, It.IsAny<CancellationToken>()))
@@ -235,7 +234,7 @@ namespace Microservice.Test.API.Controllers
             var id = 1;
 
             _mockMediator
-                .Setup(m => m.Send(It.IsAny<GetExampleByIdQuery>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Mediator error"));
 
             // Act & Assert
@@ -247,9 +246,9 @@ namespace Microservice.Test.API.Controllers
         public async Task CreateExample_WithValidationFailure_ShouldReturnBadRequest()
         {
             // Arrange
-            var command = new CreateExampleCommand(0); // Invalid ID
+            var command = new CreateExampleCommand("", null); // Invalid: empty name
             var failureResult = Result<int>.Failure(
-                Error.Validation("Id must be greater than 0"));
+                Error.Validation("Name is required"));
 
             _mockMediator
                 .Setup(m => m.Send(It.IsAny<CreateExampleCommand>(), It.IsAny<CancellationToken>()))
@@ -264,13 +263,5 @@ namespace Microservice.Test.API.Controllers
             objResult.Should().NotBeNull();
             objResult!.StatusCode.Should().Be(400);
         }
-    }
-
-    // Helper DTO for testing (mirrors actual DTO structure)
-    public class GetExampleByPredicateDto
-    {
-        public int Id { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

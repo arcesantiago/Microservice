@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Microservice.Application.Features.Examples.Commands.CreateExample
 {
@@ -8,7 +8,8 @@ namespace Microservice.Application.Features.Examples.Commands.CreateExample
     /// Use Case: Validate incoming create command before handler execution
     /// 
     /// Validation Rules:
-    /// - Id: Must be provided and greater than 0
+    /// - Name: Required, max 200 characters
+    /// - Description: Optional, max 1000 characters
     /// 
     /// Integration with Result Pattern:
     /// - Invalid commands return Result<int>.Failure() instead of exception
@@ -24,12 +25,16 @@ namespace Microservice.Application.Features.Examples.Commands.CreateExample
     {
         public CreateExampleCommandValidator()
         {
-            // Validate Id is required and greater than 0
-            RuleFor(x => x.Id)
-                .GreaterThan(0)
-                .WithMessage("Id must be greater than 0")
-                .WithErrorCode("IdInvalid")
-                .WithSeverity(Severity.Error);
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .WithMessage("Name is required")
+                .MaximumLength(200)
+                .WithMessage("Name must not exceed 200 characters");
+
+            RuleFor(x => x.Description)
+                .MaximumLength(1000)
+                .WithMessage("Description must not exceed 1000 characters")
+                .When(x => !string.IsNullOrEmpty(x.Description));
         }
     }
 }

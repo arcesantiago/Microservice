@@ -32,7 +32,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
         {
             // Arrange
             var query = new GetExampleByIdQuery(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
             var dto = new GetExampleByIdDto { Id = 1, CreatedAt = DateTimeOffset.UtcNow };
 
             _mockReadRepository
@@ -79,7 +79,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
         {
             // Arrange
             var query = new GetExampleByIdQuery(5);
-            var example = new Example(5);
+            var example = new Example("Test", "Description") { Id = 5 };
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(5, It.IsAny<CancellationToken>()))
@@ -101,7 +101,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
         {
             // Arrange
             var query = new GetExampleByIdQuery(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
             var dto = new GetExampleByIdDto { Id = 1 };
 
             _mockReadRepository
@@ -127,7 +127,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
         {
             // Arrange
             var query = new GetExampleByIdQuery(id);
-            var example = new Example(id);
+            var example = new Example("Test", "Description") { Id = id };
             var dto = new GetExampleByIdDto { Id = id };
 
             _mockReadRepository
@@ -151,7 +151,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
         {
             // Arrange
             var query = new GetExampleByIdQuery(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockReadRepository
@@ -225,7 +225,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
             var query = new GetExampleByIdQuery(1);
             var createdAt = DateTimeOffset.UtcNow.AddDays(-1);
             var updatedAt = DateTimeOffset.UtcNow;
-            var example = new Example(1) { CreatedAt = createdAt, UpdatedAt = updatedAt };
+            var example = new Example("Test", "Description") { Id = 1, CreatedAt = createdAt, UpdatedAt = updatedAt };
             var dto = new GetExampleByIdDto
             {
                 Id = 1,

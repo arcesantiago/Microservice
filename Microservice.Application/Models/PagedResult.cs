@@ -1,4 +1,4 @@
-﻿namespace Microservice.Application.Models
+namespace Microservice.Application.Models
 {
     public class PagedResult<T> where T : class
     {
@@ -10,7 +10,7 @@
 
         public PagedResult(IEnumerable<T> results, int rowsCount, int currentPage, int pageSize)
         {
-            Results = results;
+            Results = results ?? Enumerable.Empty<T>();
             RowsCount = rowsCount;
             PageSize = pageSize;
             CurrentPage = currentPage;

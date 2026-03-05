@@ -33,7 +33,11 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExamplesPag
         {
             // Arrange
             var query = new GetExamplesPaginatedQuery(1, 10);
-            var examples = new List<Example> { new Example(1), new Example(2) };
+            var examples = new List<Example>
+            {
+                new Example("Test1", "Desc1") { Id = 1 },
+                new Example("Test2", "Desc2") { Id = 2 }
+            };
             var pagedResult = new PagedResult<Example>(examples, 25, 1, 10);
             var dtos = new List<GetExamplesPaginatedDto>();
 
@@ -65,7 +69,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExamplesPag
         {
             // Arrange
             var query = new GetExamplesPaginatedQuery(1, 5);
-            var examples = Enumerable.Range(1, 5).Select(i => new Example(i)).ToList();
+            var examples = Enumerable.Range(1, 5).Select(i => new Example($"Test{i}", "Desc") { Id = i }).ToList();
             var pagedResult = new PagedResult<Example>(examples, 50, 1, 5);
             var dtos = new List<GetExamplesPaginatedDto>();
 
@@ -98,7 +102,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExamplesPag
         {
             // Arrange
             var query = new GetExamplesPaginatedQuery(3, 5);
-            var examples = Enumerable.Range(11, 5).Select(i => new Example(i)).ToList();
+            var examples = Enumerable.Range(11, 5).Select(i => new Example($"Test{i}", "Desc") { Id = i }).ToList();
             var pagedResult = new PagedResult<Example>(examples, 25, 3, 5);
             var dtos = new List<GetExamplesPaginatedDto>();
 
@@ -253,7 +257,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExamplesPag
         {
             // Arrange
             var query = new GetExamplesPaginatedQuery(1, 10);
-            var examples = new List<Example> { new Example(1) };
+            var examples = new List<Example> { new Example("Test", "Description") { Id = 1 } };
             var pagedResult = new PagedResult<Example>(examples, 1, 1, 10);
 
             _mockReadRepository

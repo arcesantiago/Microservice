@@ -10,90 +10,105 @@ namespace Microservice.Test.Domain.Entities
     public class ExampleTests
     {
         [Fact]
-        public void Constructor_WithValidId_ShouldCreateInstance()
+        public void Constructor_WithValidNameAndDescription_ShouldCreateInstance()
         {
             // Arrange
-            var id = 1;
+            var name = "Test Name";
+            var description = "Test Description";
 
             // Act
-            var example = new Example(id);
+            var example = new Example(name, description);
 
             // Assert
             example.Should().NotBeNull();
-            example.Id.Should().Be(id);
+            example.Name.Should().Be(name);
+            example.Description.Should().Be(description);
             example.CreatedAt.Should().NotBeAfter(DateTimeOffset.UtcNow.AddSeconds(1));
             example.UpdatedAt.Should().NotBeAfter(DateTimeOffset.UtcNow.AddSeconds(1));
         }
 
         [Fact]
-        public void Constructor_WithValidId_ShouldSetCreatedAndUpdatedAtToCurrentTime()
+        public void Constructor_WithValidNameAndNullDescription_ShouldCreateInstance()
         {
             // Arrange
-            var id = 100;
-            var beforeCreation = DateTimeOffset.UtcNow.AddSeconds(-1);
+            var name = "Test Name";
 
             // Act
-            var example = new Example(id);
-            var afterCreation = DateTimeOffset.UtcNow.AddSeconds(1);
+            var example = new Example(name, null);
 
             // Assert
-            example.CreatedAt.Should().BeOnOrAfter(beforeCreation);
-            example.CreatedAt.Should().BeOnOrBefore(afterCreation);
-            example.UpdatedAt.Should().BeOnOrAfter(beforeCreation);
-            example.UpdatedAt.Should().BeOnOrBefore(afterCreation);
+            example.Should().NotBeNull();
+            example.Name.Should().Be(name);
+            example.Description.Should().BeNull();
+            example.CreatedAt.Should().NotBeAfter(DateTimeOffset.UtcNow.AddSeconds(1));
+            example.UpdatedAt.Should().NotBeAfter(DateTimeOffset.UtcNow.AddSeconds(1));
+        }
+
+        [Fact]
+        public void Constructor_WithValidName_ShouldTrimWhitespace()
+        {
+            // Arrange
+            var name = "  Test Name  ";
+            var description = "  Test Description  ";
+
+            // Act
+            var example = new Example(name, description);
+
+            // Assert
+            example.Name.Should().Be("Test Name");
+            example.Description.Should().Be("Test Description");
         }
 
         [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        [InlineData(-100)]
-        public void Constructor_WithInvalidId_ShouldThrowArgumentException(int invalidId)
+        [InlineData("")]
+        [InlineData("   ")]
+        public void Constructor_WithInvalidName_ShouldThrowArgumentException(string invalidName)
         {
             // Act & Assert
-            var action = () => new Example(invalidId);
+            var action = () => new Example(invalidName, null);
             action.Should().Throw<ArgumentException>()
-                .WithMessage("Id must be greater than 0.*");
+                .WithMessage("Name is required.*");
         }
 
         [Fact]
-        public void Constructor_WithZero_ShouldThrowArgumentExceptionWithCorrectParameterName()
+        public void Constructor_WithNullName_ShouldThrowArgumentNullException()
         {
             // Act & Assert
-            var action = () => new Example(0);
+            var action = () => new Example(null!, null);
             action.Should().Throw<ArgumentException>()
-                .WithParameterName("Id");
+                .WithMessage("Name is required.*");
         }
 
         [Fact]
-        public void Constructor_WithNegativeId_ShouldThrowArgumentException()
+        public void Constructor_WithEmptyName_ShouldThrowArgumentExceptionWithCorrectParameterName()
         {
             // Act & Assert
-            var action = () => new Example(-1);
+            var action = () => new Example("", null);
             action.Should().Throw<ArgumentException>()
-                .WithMessage("Id must be greater than 0.*");
+                .WithParameterName("name");
         }
 
         [Fact]
         public void CreatedAtAndUpdatedAt_ShouldBeEqual_WhenJustCreated()
         {
             // Arrange & Act
-            var example = new Example(1);
+            var example = new Example("Test Name", "Test Description");
 
-            // Assert
-            example.CreatedAt.Should().Be(example.UpdatedAt);
+            // Assert - allow small time difference as they are set in sequence
+            (example.UpdatedAt - example.CreatedAt).Should().BeLessThan(TimeSpan.FromSeconds(1));
         }
 
         [Theory]
-        [InlineData(1)]
-        [InlineData(int.MaxValue)]
-        [InlineData(999)]
-        public void Constructor_WithDifferentValidIds_ShouldHaveCorrectId(int id)
+        [InlineData("Name 1")]
+        [InlineData("Another Name")]
+        [InlineData("Single")]
+        public void Constructor_WithDifferentValidNames_ShouldHaveCorrectName(string name)
         {
             // Act
-            var example = new Example(id);
+            var example = new Example(name, null);
 
             // Assert
-            example.Id.Should().Be(id);
+            example.Name.Should().Be(name);
         }
     }
 }

@@ -33,8 +33,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         public async Task Handle_WithValidCommand_ShouldAddExampleAndReturnId()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
-            var mappedExample = new Example(1);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
+            mappedExample.Id = 1;
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -54,7 +55,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
             // Assert
             result.Should().NotBeNull();
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(1);
+            result.Value.Should().Be(mappedExample.Id);
             _mockMapper.Verify(m => m.Map<Example>(command), Times.Once);
             _mockWriteRepository.Verify(r => r.AddAsync(mappedExample, It.IsAny<CancellationToken>()), Times.Once);
             _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -64,8 +65,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         public async Task Handle_ShouldMapCommandToExample()
         {
             // Arrange
-            var command = new CreateExampleCommand(5);
-            var mappedExample = new Example(5);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -82,8 +83,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         public async Task Handle_ShouldCallAddAsyncWithMappedExample()
         {
             // Arrange
-            var command = new CreateExampleCommand(10);
-            var mappedExample = new Example(10);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -102,8 +103,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         public async Task Handle_ShouldSaveChangesAfterAdding()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
-            var mappedExample = new Example(1);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -123,8 +124,9 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         {
             // Arrange
             var exampleId = 42;
-            var command = new CreateExampleCommand(exampleId);
-            var mappedExample = new Example(exampleId);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
+            mappedExample.Id = exampleId;
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -143,11 +145,12 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         [InlineData(1)]
         [InlineData(100)]
         [InlineData(int.MaxValue)]
-        public async Task Handle_WithDifferentIds_ShouldReturnCorrespondingId(int id)
+        public async Task Handle_WithDifferentIds_ShouldReturnCorrespondingId(int expectedId)
         {
             // Arrange
-            var command = new CreateExampleCommand(id);
-            var mappedExample = new Example(id);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
+            mappedExample.Id = expectedId;
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -157,15 +160,15 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.Value.Should().Be(id);
+            result.Value.Should().Be(expectedId);
         }
 
         [Fact]
         public async Task Handle_ShouldRespectCancellationToken()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
-            var mappedExample = new Example(1);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockMapper
@@ -188,8 +191,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         public async Task Handle_WhenAddAsyncThrows_ShouldPropagateException()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
-            var mappedExample = new Example(1);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -208,8 +211,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         public async Task Handle_WhenSaveChangesThrows_ShouldPropagateException()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
-            var mappedExample = new Example(1);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -228,8 +231,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         public async Task Handle_ShouldCallRepositoryOperationsInCorrectOrder()
         {
             // Arrange
-            var command = new CreateExampleCommand(1);
-            var mappedExample = new Example(1);
+            var command = new CreateExampleCommand("Test", "Description");
+            var mappedExample = new Example("Test", "Description");
             var callOrder = new List<string>();
 
             _mockMapper

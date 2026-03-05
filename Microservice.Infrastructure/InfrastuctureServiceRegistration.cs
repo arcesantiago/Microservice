@@ -2,7 +2,7 @@
 using Microservice.Application.Contracts.Persistence;
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Infrastructure.Cache;
-using Microservice.Infrastructure.Percistence;
+using Microservice.Infrastructure.Persistence;
 using Microservice.Infrastructure.Repositories.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

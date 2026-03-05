@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microservice.API.Extensions;
 using Microservice.Application.Common.Results;
 using Microservice.Application.DTOs;
@@ -234,6 +234,7 @@ namespace Microservice.API.Controllers
         /// Update entire Example
         /// 
         /// Use Case: Full entity replacement (PUT semantics)
+        /// Body: { name?: string, description?: string }
         /// 
         /// Returns: 200 OK with updated ID
         /// Error: 404 Not Found if not exists
@@ -243,9 +244,10 @@ namespace Microservice.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateExample(
             int id,
+            [FromBody] UpdateExampleRequestDto? request,
             CancellationToken cancellationToken)
         {
-            var command = new UpdateExampleCommand(id);
+            var command = new UpdateExampleCommand(id, request?.Name, request?.Description);
             var result = await _mediator.Send(command, cancellationToken);
             return result.ToActionResult();
         }
@@ -255,6 +257,7 @@ namespace Microservice.API.Controllers
         /// Update specific fields only
         /// 
         /// Use Case: PATCH-style partial updates
+        /// Body: { name?: string, description?: string }
         /// Performance: Only modified columns in SQL
         /// 
         /// Returns: 200 OK with updated ID
@@ -265,9 +268,10 @@ namespace Microservice.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateExampleFields(
             int id,
+            [FromBody] UpdateExampleFieldsRequestDto? request,
             CancellationToken cancellationToken)
         {
-            var command = new UpdateExampleFieldsCommand(id);
+            var command = new UpdateExampleFieldsCommand(id, request?.Name, request?.Description);
             var result = await _mediator.Send(command, cancellationToken);
             return result.ToActionResult();
         }

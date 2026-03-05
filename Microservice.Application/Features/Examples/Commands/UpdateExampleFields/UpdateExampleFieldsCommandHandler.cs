@@ -65,9 +65,20 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateExampleField
             if (example == null)
                 return Result<int>.Failure(Error.NotFound($"Ejemplo con id {request.Id} no encontrado"));
 
-            Expression<Func<Example, object>>[] propertiesToUpdate = [];
+            var propertiesToUpdate = new List<Expression<Func<Example, object>>>();
 
-            writeRepository.UpdateFields(example, propertiesToUpdate);
+            if (request.Name is not null)
+            {
+                example.Name = request.Name.Trim();
+                propertiesToUpdate.Add(x => x.Name);
+            }
+            if (request.Description is not null)
+            {
+                example.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
+                propertiesToUpdate.Add(x => x.Description);
+            }
+
+            writeRepository.UpdateFields(example, [.. propertiesToUpdate]);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result<int>.Success(example.Id);

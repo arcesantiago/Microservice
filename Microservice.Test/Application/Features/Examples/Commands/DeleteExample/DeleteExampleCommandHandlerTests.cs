@@ -36,7 +36,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         {
             // Arrange
             var command = new DeleteExampleCommand(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -106,7 +106,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         {
             // Arrange
             var command = new DeleteExampleCommand(id);
-            var example = new Example(id);
+            var example = new Example("Test", "Description") { Id = id };
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(id, It.IsAny<CancellationToken>()))
@@ -125,7 +125,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         {
             // Arrange
             var command = new DeleteExampleCommand(5);
-            var example = new Example(5);
+            var example = new Example("Test", "Description") { Id = 5 };
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(5, It.IsAny<CancellationToken>()))
@@ -143,7 +143,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         {
             // Arrange
             var command = new DeleteExampleCommand(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -161,7 +161,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         {
             // Arrange
             var command = new DeleteExampleCommand(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -181,7 +181,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         {
             // Arrange
             var command = new DeleteExampleCommand(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockReadRepository
@@ -217,7 +217,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         {
             // Arrange
             var command = new DeleteExampleCommand(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -237,7 +237,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         {
             // Arrange
             var command = new DeleteExampleCommand(1);
-            var example = new Example(1);
+            var example = new Example("Test", "Description") { Id = 1 };
             var callOrder = new List<string>();
 
             _mockReadRepository
