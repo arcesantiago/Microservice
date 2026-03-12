@@ -8,8 +8,8 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateManyExamples
     /// Use Case: Validate bulk update command before handler execution
     /// 
     /// Validation Rules:
-    /// - Ids: Cannot be empty (at least one Id required)
-    /// - Ids: All IDs must be greater than 0
+    /// - PublicIds: Cannot be empty (at least one PublicId required)
+    /// - PublicIds: No empty Guid allowed
     /// 
     /// Integration with Result Pattern:
     /// - Invalid commands return Result<int>.Failure() instead of exception
@@ -31,16 +31,16 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateManyExamples
     {
         public UpdateManyExamplesCommandValidator()
         {
-            RuleFor(x => x.Ids)
+            RuleFor(x => x.PublicIds)
                 .NotEmpty()
-                .WithMessage("Ids cannot be empty")
-                .WithErrorCode("IdsEmpty")
+                .WithMessage("PublicIds cannot be empty")
+                .WithErrorCode("PublicIdsEmpty")
                 .WithSeverity(Severity.Error);
 
-            RuleFor(x => x.Ids)
-                .Must(ids => ids.All(id => id > 0))
-                .WithMessage("All Ids must be greater than 0")
-                .WithErrorCode("InvalidId")
+            RuleFor(x => x.PublicIds)
+                .Must(ids => ids.All(id => id != Guid.Empty))
+                .WithMessage("All PublicIds must be valid (not empty)")
+                .WithErrorCode("InvalidPublicId")
                 .WithSeverity(Severity.Error);
         }
     }

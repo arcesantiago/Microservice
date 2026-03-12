@@ -5,6 +5,6 @@ using Microservice.Application.DTOs;
 namespace Microservice.Application.Features.Examples.Queries.GetExampleByPredicate
 {
     public record GetExampleByPredicateQuery(
-        int Id
+        Guid PublicId
     ) : IRequest<Result<GetExampleByPredicateDto>>;
 }

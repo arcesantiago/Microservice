@@ -33,11 +33,11 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteManyExa
         }
 
         [Fact]
-        public async Task Handle_WithValidIds_ShouldDeleteMultipleAndReturnCount()
+        public async Task Handle_WithValidPublicIds_ShouldDeleteMultipleAndReturnCount()
         {
             // Arrange
-            var ids = new[] { 1, 2, 3 };
-            var command = new DeleteManyExamplesCommand(ids);
+            var publicIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+            var command = new DeleteManyExamplesCommand(publicIds);
 
             _mockWriteRepository
                 .Setup(r => r.DeleteManyAsync(It.IsAny<Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -55,8 +55,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteManyExa
         public async Task Handle_WithEmptyArray_ShouldReturnZero()
         {
             // Arrange
-            var ids = Array.Empty<int>();
-            var command = new DeleteManyExamplesCommand(ids);
+            var publicIds = Array.Empty<Guid>();
+            var command = new DeleteManyExamplesCommand(publicIds);
 
             _mockWriteRepository
                 .Setup(r => r.DeleteManyAsync(It.IsAny<Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -74,8 +74,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteManyExa
         public async Task Handle_ShouldCallDeleteManyAsync()
         {
             // Arrange
-            var ids = new[] { 1, 2, 3 };
-            var command = new DeleteManyExamplesCommand(ids);
+            var publicIds = new[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+            var command = new DeleteManyExamplesCommand(publicIds);
 
             _mockWriteRepository
                 .Setup(r => r.DeleteManyAsync(It.IsAny<Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -91,11 +91,11 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteManyExa
         }
 
         [Fact]
-        public async Task Handle_WithSingleId_ShouldDeleteOne()
+        public async Task Handle_WithSinglePublicId_ShouldDeleteOne()
         {
             // Arrange
-            var ids = new[] { 5 };
-            var command = new DeleteManyExamplesCommand(ids);
+            var publicIds = new[] { Guid.NewGuid() };
+            var command = new DeleteManyExamplesCommand(publicIds);
 
             _mockWriteRepository
                 .Setup(r => r.DeleteManyAsync(It.IsAny<Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -109,11 +109,11 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteManyExa
         }
 
         [Fact]
-        public async Task Handle_WithManyIds_ShouldDeleteAll()
+        public async Task Handle_WithManyPublicIds_ShouldDeleteAll()
         {
             // Arrange
-            var ids = Enumerable.Range(1, 100).ToArray();
-            var command = new DeleteManyExamplesCommand(ids);
+            var publicIds = Enumerable.Range(1, 100).Select(_ => Guid.NewGuid()).ToArray();
+            var command = new DeleteManyExamplesCommand(publicIds);
 
             _mockWriteRepository
                 .Setup(r => r.DeleteManyAsync(It.IsAny<Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -131,8 +131,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteManyExa
         public async Task Handle_ShouldRespectCancellationToken()
         {
             // Arrange
-            var ids = new[] { 1, 2 };
-            var command = new DeleteManyExamplesCommand(ids);
+            var publicIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            var command = new DeleteManyExamplesCommand(publicIds);
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockWriteRepository
@@ -152,8 +152,8 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteManyExa
         public async Task Handle_WhenRepositoryThrows_ShouldPropagateException()
         {
             // Arrange
-            var ids = new[] { 1, 2 };
-            var command = new DeleteManyExamplesCommand(ids);
+            var publicIds = new[] { Guid.NewGuid(), Guid.NewGuid() };
+            var command = new DeleteManyExamplesCommand(publicIds);
 
             _mockWriteRepository
                 .Setup(r => r.DeleteManyAsync(It.IsAny<Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))

@@ -50,6 +50,7 @@ namespace Microservice.Application.Features.Examples.Queries.GetExamplesWithProj
             var data = await queryRepository.GetListAsync(x => new GetExamplesWithProjectionDto
             {
                 Id = x.Id,
+                PublicId = x.PublicId,
                 Name = x.Name,
                 Description = x.Description
             }, cancellationToken: cancellationToken);

@@ -4,6 +4,6 @@ using Microservice.Application.Common.Results;
 namespace Microservice.Application.Features.Examples.Queries.ExistsExample
 {
     public record ExistsExampleQuery(
-        int Id
+        Guid PublicId
     ) : IRequest<Result<bool>>;
 }

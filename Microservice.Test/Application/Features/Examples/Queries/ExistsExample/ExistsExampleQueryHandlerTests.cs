@@ -27,7 +27,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.ExistsExample
         public async Task Handle_WithExistingId_ShouldReturnTrue()
         {
             // Arrange
-            var query = new ExistsExampleQuery(1);
+            var query = new ExistsExampleQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -45,7 +45,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.ExistsExample
         public async Task Handle_WithNonExistentId_ShouldReturnFalse()
         {
             // Arrange
-            var query = new ExistsExampleQuery(999);
+            var query = new ExistsExampleQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -63,7 +63,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.ExistsExample
         public async Task Handle_ShouldCallExistsAsync()
         {
             // Arrange
-            var query = new ExistsExampleQuery(1);
+            var query = new ExistsExampleQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -79,14 +79,12 @@ namespace Microservice.Test.Application.Features.Examples.Queries.ExistsExample
         }
 
         [Theory]
-        [InlineData(1, true)]
-        [InlineData(2, true)]
-        [InlineData(999, false)]
-        [InlineData(500, false)]
-        public async Task Handle_WithDifferentIds_ShouldReturnCorrectValue(int id, bool shouldExist)
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Handle_WithDifferentPublicIds_ShouldReturnCorrectValue(bool shouldExist)
         {
             // Arrange
-            var query = new ExistsExampleQuery(id);
+            var query = new ExistsExampleQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -104,7 +102,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.ExistsExample
         public async Task Handle_ShouldRespectCancellationToken()
         {
             // Arrange
-            var query = new ExistsExampleQuery(1);
+            var query = new ExistsExampleQuery(Guid.NewGuid());
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockReadRepository
@@ -124,7 +122,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.ExistsExample
         public async Task Handle_WhenRepositoryThrows_ShouldPropagateException()
         {
             // Arrange
-            var query = new ExistsExampleQuery(1);
+            var query = new ExistsExampleQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -139,7 +137,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.ExistsExample
         public async Task Handle_ShouldReturnSuccessResult()
         {
             // Arrange
-            var query = new ExistsExampleQuery(1);
+            var query = new ExistsExampleQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))
@@ -157,7 +155,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.ExistsExample
         public async Task Handle_WhenEntityExists_ShouldNotReturnErrors()
         {
             // Arrange
-            var query = new ExistsExampleQuery(1);
+            var query = new ExistsExampleQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.ExistsAsync(It.IsAny<System.Linq.Expressions.Expression<Func<Example, bool>>>(), It.IsAny<CancellationToken>()))

@@ -35,19 +35,19 @@ namespace Microservice.Application.Features.Examples.Commands.DeleteExample
         IReadRepository<Example> readRepository,
         IWriteRepository<Example> writeRepository,
         IUnitOfWork unitOfWork
-        ) : IRequestHandler<DeleteExampleCommand, Result<int>>
+        ) : IRequestHandler<DeleteExampleCommand, Result<Guid>>
     {
-        public async Task<Result<int>> Handle(DeleteExampleCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(DeleteExampleCommand request, CancellationToken cancellationToken)
         {
-            var example = await readRepository.FindAsync(request.Id, cancellationToken);
+            var example = await readRepository.GetEntityAsync(x => x.PublicId == request.PublicId, cancellationToken: cancellationToken);
 
             if (example == null)
-                return Result<int>.Failure(Error.NotFound($"Ejemplo con id {request.Id} no encontrado"));
+                return Result<Guid>.Failure(Error.NotFound($"Ejemplo con publicId {request.PublicId} no encontrado"));
 
             writeRepository.Delete(example);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result<int>.Success(request.Id);
+            return Result<Guid>.Success(request.PublicId);
         }
     }
 }

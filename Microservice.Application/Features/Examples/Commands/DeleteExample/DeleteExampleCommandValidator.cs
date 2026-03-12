@@ -24,10 +24,10 @@ namespace Microservice.Application.Features.Examples.Commands.DeleteExample
     {
         public DeleteExampleCommandValidator()
         {
-            RuleFor(x => x.Id)
-                .GreaterThan(0)
-                .WithMessage("Id must be greater than 0")
-                .WithErrorCode("IdInvalid")
+            RuleFor(x => x.PublicId)
+                .NotEmpty()
+                .WithMessage("PublicId is required")
+                .WithErrorCode("PublicIdInvalid")
                 .WithSeverity(Severity.Error);
         }
     }

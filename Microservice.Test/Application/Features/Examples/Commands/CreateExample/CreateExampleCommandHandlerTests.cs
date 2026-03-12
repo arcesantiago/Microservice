@@ -30,7 +30,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         }
 
         [Fact]
-        public async Task Handle_WithValidCommand_ShouldAddExampleAndReturnId()
+        public async Task Handle_WithValidCommand_ShouldAddExampleAndReturnPublicId()
         {
             // Arrange
             var command = new CreateExampleCommand("Test", "Description");
@@ -55,7 +55,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
             // Assert
             result.Should().NotBeNull();
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(mappedExample.Id);
+            result.Value.Should().Be(mappedExample.PublicId);
             _mockMapper.Verify(m => m.Map<Example>(command), Times.Once);
             _mockWriteRepository.Verify(r => r.AddAsync(mappedExample, It.IsAny<CancellationToken>()), Times.Once);
             _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -120,13 +120,11 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
         }
 
         [Fact]
-        public async Task Handle_ShouldReturnSuccessResultWithExampleId()
+        public async Task Handle_ShouldReturnSuccessResultWithExamplePublicId()
         {
             // Arrange
-            var exampleId = 42;
             var command = new CreateExampleCommand("Test", "Description");
             var mappedExample = new Example("Test", "Description");
-            mappedExample.Id = exampleId;
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -137,20 +135,16 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(exampleId);
+            result.Value.Should().Be(mappedExample.PublicId);
             result.Errors.Should().BeEmpty();
         }
 
-        [Theory]
-        [InlineData(1)]
-        [InlineData(100)]
-        [InlineData(int.MaxValue)]
-        public async Task Handle_WithDifferentIds_ShouldReturnCorrespondingId(int expectedId)
+        [Fact]
+        public async Task Handle_WithDifferentExamples_ShouldReturnCorrespondingPublicId()
         {
             // Arrange
             var command = new CreateExampleCommand("Test", "Description");
             var mappedExample = new Example("Test", "Description");
-            mappedExample.Id = expectedId;
 
             _mockMapper
                 .Setup(m => m.Map<Example>(command))
@@ -160,7 +154,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.CreateExample
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.Value.Should().Be(expectedId);
+            result.Value.Should().Be(mappedExample.PublicId);
         }
 
         [Fact]

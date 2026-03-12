@@ -31,9 +31,9 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         public async Task Handle_WithExistingId_ShouldReturnEntity()
         {
             // Arrange
-            var query = new GetExampleByPredicateQuery(1);
-            var example = new Example("Test", "Description") { Id = 1 };
-            var dto = new GetExampleByPredicateDto { Id = 1 };
+            var query = new GetExampleByPredicateQuery(Guid.NewGuid());
+            var example = new Example("Test", "Description");
+            var dto = new GetExampleByPredicateDto { Id = 1, PublicId = example.PublicId };
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -60,7 +60,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         public async Task Handle_WithNonExistentId_ShouldReturnNotFound()
         {
             // Arrange
-            var query = new GetExampleByPredicateQuery(999);
+            var query = new GetExampleByPredicateQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -84,8 +84,8 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         public async Task Handle_ShouldCallGetEntityAsync()
         {
             // Arrange
-            var query = new GetExampleByPredicateQuery(1);
-            var example = new Example("Test", "Description") { Id = 1 };
+            var query = new GetExampleByPredicateQuery(Guid.NewGuid());
+            var example = new Example("Test", "Description");
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -98,7 +98,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
 
             _mockMapper
                 .Setup(m => m.Map<GetExampleByPredicateDto>(example))
-                .Returns(new GetExampleByPredicateDto { Id = 1 });
+                .Returns(new GetExampleByPredicateDto { Id = 1, PublicId = example.PublicId });
 
             // Act
             await _handler.Handle(query, CancellationToken.None);
@@ -114,16 +114,15 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
                 Times.Once);
         }
 
-        [Theory]
-        [InlineData(1)]
-        [InlineData(50)]
-        [InlineData(int.MaxValue)]
-        public async Task Handle_WithDifferentIds_ShouldReturnCorrectId(int id)
+        [Fact]
+        public async Task Handle_WithDifferentPublicIds_ShouldReturnCorrectDto()
         {
             // Arrange
-            var query = new GetExampleByPredicateQuery(id);
-            var example = new Example("Test", "Description") { Id = id };
-            var dto = new GetExampleByPredicateDto { Id = id };
+            var publicId = Guid.NewGuid();
+            var query = new GetExampleByPredicateQuery(publicId);
+            var example = new Example("Test", "Description");
+            example.PublicId = publicId;
+            var dto = new GetExampleByPredicateDto { Id = 1, PublicId = publicId };
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -143,15 +142,15 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            result.Value!.Id.Should().Be(id);
+            result.Value!.PublicId.Should().Be(publicId);
         }
 
         [Fact]
         public async Task Handle_ShouldRespectCancellationToken()
         {
             // Arrange
-            var query = new GetExampleByPredicateQuery(1);
-            var example = new Example("Test", "Description") { Id = 1 };
+            var query = new GetExampleByPredicateQuery(Guid.NewGuid());
+            var example = new Example("Test", "Description");
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockReadRepository
@@ -165,7 +164,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
 
             _mockMapper
                 .Setup(m => m.Map<GetExampleByPredicateDto>(example))
-                .Returns(new GetExampleByPredicateDto { Id = 1 });
+                .Returns(new GetExampleByPredicateDto { Id = 1, PublicId = example.PublicId });
 
             // Act
             await _handler.Handle(query, cancellationToken);
@@ -185,7 +184,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         public async Task Handle_WhenRepositoryThrows_ShouldPropagateException()
         {
             // Arrange
-            var query = new GetExampleByPredicateQuery(1);
+            var query = new GetExampleByPredicateQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -205,7 +204,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         public async Task Handle_WithNonExistentId_ShouldNotMapEntity()
         {
             // Arrange
-            var query = new GetExampleByPredicateQuery(999);
+            var query = new GetExampleByPredicateQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -229,7 +228,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
         public async Task Handle_ShouldReturnErrorMessage()
         {
             // Arrange
-            var query = new GetExampleByPredicateQuery(999);
+            var query = new GetExampleByPredicateQuery(Guid.NewGuid());
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(

@@ -4,8 +4,8 @@ using Microservice.Application.Common.Results;
 namespace Microservice.Application.Features.Examples.Commands.UpdateExampleFields
 {
     public record UpdateExampleFieldsCommand(
-        int Id,
+        Guid PublicId,
         string? Name,
         string? Description
-    ) : IRequest<Result<int>>;
+    ) : IRequest<Result<Guid>>;
 }

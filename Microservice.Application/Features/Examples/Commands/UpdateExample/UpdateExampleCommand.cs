@@ -4,8 +4,8 @@ using Microservice.Application.Common.Results;
 namespace Microservice.Application.Features.Examples.Commands.UpdateExample
 {
     public record UpdateExampleCommand(
-        int Id,
+        Guid PublicId,
         string? Name,
         string? Description
-    ) : IRequest<Result<int>>;
+    ) : IRequest<Result<Guid>>;
 }

@@ -8,7 +8,7 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateExample
     /// Use Case: Validate update command before handler execution
     /// 
     /// Validation Rules:
-    /// - Id: Must be provided and greater than 0
+    /// - PublicId: Must be provided and not empty
     /// 
     /// Integration with Result Pattern:
     /// - Invalid commands return Result<int>.Failure() instead of exception
@@ -24,10 +24,10 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateExample
     {
         public UpdateExampleCommandValidator()
         {
-            RuleFor(x => x.Id)
-                .GreaterThan(0)
-                .WithMessage("Id must be greater than 0")
-                .WithErrorCode("IdInvalid")
+            RuleFor(x => x.PublicId)
+                .NotEmpty()
+                .WithMessage("PublicId is required")
+                .WithErrorCode("PublicIdInvalid")
                 .WithSeverity(Severity.Error);
         }
     }

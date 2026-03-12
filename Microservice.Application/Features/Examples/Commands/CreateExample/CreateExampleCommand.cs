@@ -6,5 +6,5 @@ namespace Microservice.Application.Features.Examples.Commands.CreateExample
     public record CreateExampleCommand(
         string Name,
         string? Description
-    ) : IRequest<Result<int>>;
+    ) : IRequest<Result<Guid>>;
 }

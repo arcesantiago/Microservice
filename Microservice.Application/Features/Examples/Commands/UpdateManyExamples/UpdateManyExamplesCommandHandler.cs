@@ -51,7 +51,7 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateManyExamples
     {
         public async Task<Result<int>> Handle(UpdateManyExamplesCommand request, CancellationToken cancellationToken)
         {
-            IQueryable<Example> filter(IQueryable<Example> query) => query.Where(x => request.Ids.Contains(x.Id));
+            IQueryable<Example> filter(IQueryable<Example> query) => query.Where(x => request.PublicIds.Contains(x.PublicId));
 
             async Task<int> updateAction(IQueryable<Example> query)
             {

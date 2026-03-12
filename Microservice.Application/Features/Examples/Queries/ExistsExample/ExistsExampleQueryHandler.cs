@@ -43,7 +43,7 @@ namespace Microservice.Application.Features.Examples.Queries.ExistsExample
     {
         public async Task<Result<bool>> Handle(ExistsExampleQuery request, CancellationToken cancellationToken)
         {
-            var exists = await readRepository.ExistsAsync(x => x.Id == request.Id, cancellationToken);
+            var exists = await readRepository.ExistsAsync(x => x.PublicId == request.PublicId, cancellationToken);
             return Result<bool>.Success(exists);
         }
     }

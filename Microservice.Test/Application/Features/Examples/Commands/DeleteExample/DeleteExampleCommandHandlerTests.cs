@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using FluentAssertions;
 using Moq;
 using MediatR;
@@ -32,14 +33,17 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         }
 
         [Fact]
-        public async Task Handle_WithExistingId_ShouldDeleteExampleAndReturnSuccess()
+        public async Task Handle_WithExistingPublicId_ShouldDeleteExampleAndReturnSuccess()
         {
             // Arrange
-            var command = new DeleteExampleCommand(1);
-            var example = new Example("Test", "Description") { Id = 1 };
+            var publicId = Guid.NewGuid();
+            var command = new DeleteExampleCommand(publicId);
+            var example = new Example("Test", "Description");
+            example.Id = 1;
+            example.PublicId = publicId;
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(example);
 
             _mockWriteRepository
@@ -56,7 +60,7 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
             // Assert
             result.Should().NotBeNull();
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(1);
+            result.Value.Should().Be(publicId);
             _mockWriteRepository.Verify(r => r.Delete(example), Times.Once);
             _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -65,11 +69,11 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         public async Task Handle_WithNonExistentId_ShouldReturnFailureResult()
         {
             // Arrange
-            var command = new DeleteExampleCommand(999);
+            var command = new DeleteExampleCommand(Guid.NewGuid());
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(999, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Example)null!);
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Example?)null);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -85,11 +89,11 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         public async Task Handle_WithNonExistentId_ShouldNotCallSaveChanges()
         {
             // Arrange
-            var command = new DeleteExampleCommand(999);
+            var command = new DeleteExampleCommand(Guid.NewGuid());
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(999, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Example)null!);
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Example?)null);
 
             // Act
             await _handler.Handle(command, CancellationToken.None);
@@ -98,18 +102,17 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
             _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
-        [Theory]
-        [InlineData(1)]
-        [InlineData(50)]
-        [InlineData(int.MaxValue)]
-        public async Task Handle_WithDifferentIds_ShouldReturnCorrectId(int id)
+        [Fact]
+        public async Task Handle_WithDifferentPublicIds_ShouldReturnCorrectPublicId()
         {
             // Arrange
-            var command = new DeleteExampleCommand(id);
-            var example = new Example("Test", "Description") { Id = id };
+            var publicId = Guid.NewGuid();
+            var command = new DeleteExampleCommand(publicId);
+            var example = new Example("Test", "Description");
+            example.PublicId = publicId;
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(id, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(example);
 
             // Act
@@ -117,36 +120,40 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            result.Value.Should().Be(id);
+            result.Value.Should().Be(publicId);
         }
 
         [Fact]
-        public async Task Handle_ShouldCallFindAsyncWithCorrectId()
+        public async Task Handle_ShouldCallGetEntityAsyncWithPredicate()
         {
             // Arrange
-            var command = new DeleteExampleCommand(5);
-            var example = new Example("Test", "Description") { Id = 5 };
+            var publicId = Guid.NewGuid();
+            var command = new DeleteExampleCommand(publicId);
+            var example = new Example("Test", "Description");
+            example.PublicId = publicId;
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(5, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(example);
 
             // Act
             await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            _mockReadRepository.Verify(r => r.FindAsync(5, It.IsAny<CancellationToken>()), Times.Once);
+            _mockReadRepository.Verify(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ShouldCallDeleteWithCorrectExample()
         {
             // Arrange
-            var command = new DeleteExampleCommand(1);
-            var example = new Example("Test", "Description") { Id = 1 };
+            var publicId = Guid.NewGuid();
+            var command = new DeleteExampleCommand(publicId);
+            var example = new Example("Test", "Description");
+            example.PublicId = publicId;
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(example);
 
             // Act
@@ -160,11 +167,13 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         public async Task Handle_ShouldSaveChangesAfterDelete()
         {
             // Arrange
-            var command = new DeleteExampleCommand(1);
-            var example = new Example("Test", "Description") { Id = 1 };
+            var publicId = Guid.NewGuid();
+            var command = new DeleteExampleCommand(publicId);
+            var example = new Example("Test", "Description");
+            example.PublicId = publicId;
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(example);
 
             // Act
@@ -180,12 +189,14 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         public async Task Handle_ShouldRespectCancellationToken()
         {
             // Arrange
-            var command = new DeleteExampleCommand(1);
-            var example = new Example("Test", "Description") { Id = 1 };
+            var publicId = Guid.NewGuid();
+            var command = new DeleteExampleCommand(publicId);
+            var example = new Example("Test", "Description");
+            example.PublicId = publicId;
             var cancellationToken = new CancellationToken(canceled: false);
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(1, cancellationToken))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, true, cancellationToken))
                 .ReturnsAsync(example);
 
             // Act
@@ -201,10 +212,10 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         public async Task Handle_WhenRepositoryThrows_ShouldPropagateException()
         {
             // Arrange
-            var command = new DeleteExampleCommand(1);
+            var command = new DeleteExampleCommand(Guid.NewGuid());
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Database error"));
 
             // Act & Assert
@@ -216,11 +227,11 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         public async Task Handle_WhenSaveChangesThrows_ShouldPropagateException()
         {
             // Arrange
-            var command = new DeleteExampleCommand(1);
+            var command = new DeleteExampleCommand(Guid.NewGuid());
             var example = new Example("Test", "Description") { Id = 1 };
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(example);
 
             _mockUnitOfWork
@@ -236,12 +247,12 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         public async Task Handle_ShouldCallRepositoryOperationsInCorrectOrder()
         {
             // Arrange
-            var command = new DeleteExampleCommand(1);
+            var command = new DeleteExampleCommand(Guid.NewGuid());
             var example = new Example("Test", "Description") { Id = 1 };
             var callOrder = new List<string>();
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
                 .Callback(async () =>
                 {
                     callOrder.Add("Find");
@@ -270,20 +281,21 @@ namespace Microservice.Test.Application.Features.Examples.Commands.DeleteExample
         }
 
         [Fact]
-        public async Task Handle_WithNonExistentId_ShouldReturnErrorMessage()
+        public async Task Handle_WithNonExistentPublicId_ShouldReturnErrorMessage()
         {
             // Arrange
-            var command = new DeleteExampleCommand(999);
+            var publicId = Guid.NewGuid();
+            var command = new DeleteExampleCommand(publicId);
 
             _mockReadRepository
-                .Setup(r => r.FindAsync(999, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Example)null!);
+                .Setup(r => r.GetEntityAsync(It.IsAny<Expression<Func<Example, bool>>>(), null, null, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Example?)null);
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            result.Errors[0].Message.Should().Contain("999");
+            result.Errors[0].Message.Should().Contain(publicId.ToString());
             result.Errors[0].Message.Should().Contain("no encontrado");
         }
     }

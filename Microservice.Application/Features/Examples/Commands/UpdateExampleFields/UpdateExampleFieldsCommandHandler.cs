@@ -56,14 +56,14 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateExampleField
         IReadRepository<Example> readRepository,
         IWriteRepository<Example> writeRepository,
         IUnitOfWork unitOfWork
-        ) : IRequestHandler<UpdateExampleFieldsCommand, Result<int>>
+        ) : IRequestHandler<UpdateExampleFieldsCommand, Result<Guid>>
     {
-        public async Task<Result<int>> Handle(UpdateExampleFieldsCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(UpdateExampleFieldsCommand request, CancellationToken cancellationToken)
         {
-            var example = await readRepository.FindAsync(request.Id, cancellationToken);
+            var example = await readRepository.GetEntityAsync(x => x.PublicId == request.PublicId, cancellationToken: cancellationToken);
 
             if (example == null)
-                return Result<int>.Failure(Error.NotFound($"Ejemplo con id {request.Id} no encontrado"));
+                return Result<Guid>.Failure(Error.NotFound($"Ejemplo con publicId {request.PublicId} no encontrado"));
 
             var propertiesToUpdate = new List<Expression<Func<Example, object>>>();
 
@@ -81,7 +81,7 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateExampleField
             writeRepository.UpdateFields(example, [.. propertiesToUpdate]);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result<int>.Success(example.Id);
+            return Result<Guid>.Success(example.PublicId);
         }
     }
 }

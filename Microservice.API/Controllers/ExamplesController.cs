@@ -56,11 +56,11 @@ namespace Microservice.API.Controllers
         /// POST /api/examples
         /// Create a new Example
         /// 
-        /// Returns: 201 Created with the new resource ID
+        /// Returns: 201 Created with the new resource PublicId
         /// Error: 400 Bad Request if validation fails
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateExample(
             [FromBody] CreateExampleCommand request,
@@ -71,20 +71,20 @@ namespace Microservice.API.Controllers
         }
 
         /// <summary>
-        /// GET /api/examples/{id}
-        /// Get Example by ID
+        /// GET /api/examples/{publicId}
+        /// Get Example by PublicId
         /// 
         /// Returns: 200 OK with Example data
         /// Error: 404 Not Found if not exists
         /// </summary>
-        [HttpGet("{id:int}")]
+        [HttpGet("{publicId:guid}")]
         [ProducesResponseType(typeof(GetExampleByPredicateDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetExampleById(
-            int id,
+            Guid publicId,
             CancellationToken cancellationToken)
         {
-            var query = new GetExampleByPredicateQuery(id);
+            var query = new GetExampleByPredicateQuery(publicId);
             var result = await _mediator.Send(query, cancellationToken);
             return result.ToActionResult();
         }
@@ -149,19 +149,19 @@ namespace Microservice.API.Controllers
         }
 
         /// <summary>
-        /// GET /api/examples/{id}/exists
+        /// GET /api/examples/{publicId}/exists
         /// Check if Example exists
         /// 
         /// Returns: 200 OK with boolean (true/false)
         /// Performance: Optimized existence check (no data load)
         /// </summary>
-        [HttpGet("{id:int}/exists")]
+        [HttpGet("{publicId:guid}/exists")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<IActionResult> ExistsExample(
-            int id,
+            Guid publicId,
             CancellationToken cancellationToken)
         {
-            var query = new ExistsExampleQuery(id);
+            var query = new ExistsExampleQuery(publicId);
             var result = await _mediator.Send(query, cancellationToken);
             return result.ToActionResult();
         }
@@ -186,7 +186,7 @@ namespace Microservice.API.Controllers
         }
 
         /// <summary>
-        /// GET /api/examples/{id}/projection
+        /// GET /api/examples/{publicId}/projection
         /// Get single Example with field projection
         /// 
         /// Use Case: Detail view with specific fields
@@ -194,14 +194,14 @@ namespace Microservice.API.Controllers
         /// Returns: 200 OK with projected data
         /// Error: 404 Not Found
         /// </summary>
-        [HttpGet("{id:int}/projection")]
+        [HttpGet("{publicId:guid}/projection")]
         [ProducesResponseType(typeof(GetExampleWithProjectionDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetExampleWithProjection(
-            int id,
+            Guid publicId,
             CancellationToken cancellationToken)
         {
-            var query = new GetExampleWithProjectionQuery(id);
+            var query = new GetExampleWithProjectionQuery(publicId);
             var result = await _mediator.Send(query, cancellationToken);
             return result.ToActionResult();
         }
@@ -230,48 +230,48 @@ namespace Microservice.API.Controllers
         }
 
         /// <summary>
-        /// PUT /api/examples/{id}
+        /// PUT /api/examples/{publicId}
         /// Update entire Example
         /// 
         /// Use Case: Full entity replacement (PUT semantics)
         /// Body: { name?: string, description?: string }
         /// 
-        /// Returns: 200 OK with updated ID
+        /// Returns: 200 OK with updated PublicId
         /// Error: 404 Not Found if not exists
         /// </summary>
-        [HttpPut("{id:int}")]
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [HttpPut("{publicId:guid}")]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateExample(
-            int id,
+            Guid publicId,
             [FromBody] UpdateExampleRequestDto? request,
             CancellationToken cancellationToken)
         {
-            var command = new UpdateExampleCommand(id, request?.Name, request?.Description);
+            var command = new UpdateExampleCommand(publicId, request?.Name, request?.Description);
             var result = await _mediator.Send(command, cancellationToken);
             return result.ToActionResult();
         }
 
         /// <summary>
-        /// PUT /api/examples/{id}/fields
+        /// PUT /api/examples/{publicId}/fields
         /// Update specific fields only
         /// 
         /// Use Case: PATCH-style partial updates
         /// Body: { name?: string, description?: string }
         /// Performance: Only modified columns in SQL
         /// 
-        /// Returns: 200 OK with updated ID
+        /// Returns: 200 OK with updated PublicId
         /// Error: 404 Not Found if not exists
         /// </summary>
-        [HttpPut("{id:int}/fields")]
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [HttpPut("{publicId:guid}/fields")]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateExampleFields(
-            int id,
+            Guid publicId,
             [FromBody] UpdateExampleFieldsRequestDto? request,
             CancellationToken cancellationToken)
         {
-            var command = new UpdateExampleFieldsCommand(id, request?.Name, request?.Description);
+            var command = new UpdateExampleFieldsCommand(publicId, request?.Name, request?.Description);
             var result = await _mediator.Send(command, cancellationToken);
             return result.ToActionResult();
         }
@@ -280,37 +280,37 @@ namespace Microservice.API.Controllers
         /// PUT /api/examples/batch
         /// Update multiple Examples in bulk
         /// 
-        /// Body: JSON array of IDs
-        /// Example: [1, 2, 3, 4, 5]
+        /// Body: JSON array of PublicIds
+        /// Example: ["guid1", "guid2", "guid3"]
         /// 
         /// Returns: 200 OK with count of updated records
         /// </summary>
         [HttpPut("batch")]
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateManyExamples(
-            [FromBody] int[] ids,
+            [FromBody] Guid[] publicIds,
             CancellationToken cancellationToken)
         {
-            var command = new UpdateManyExamplesCommand(ids);
+            var command = new UpdateManyExamplesCommand(publicIds);
             var result = await _mediator.Send(command, cancellationToken);
             return result.ToActionResult();
         }
 
         /// <summary>
-        /// DELETE /api/examples/{id}
-        /// Delete Example by ID
+        /// DELETE /api/examples/{publicId}
+        /// Delete Example by PublicId
         /// 
-        /// Returns: 200 OK with deleted ID
+        /// Returns: 200 OK with deleted PublicId
         /// Error: 404 Not Found if not exists
         /// </summary>
-        [HttpDelete("{id:int}")]
-        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [HttpDelete("{publicId:guid}")]
+        [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteExample(
-            int id,
+            Guid publicId,
             CancellationToken cancellationToken)
         {
-            var command = new DeleteExampleCommand(id);
+            var command = new DeleteExampleCommand(publicId);
             var result = await _mediator.Send(command, cancellationToken);
             return result.ToActionResult();
         }
@@ -319,18 +319,18 @@ namespace Microservice.API.Controllers
         /// DELETE /api/examples/batch
         /// Delete multiple Examples in bulk
         /// 
-        /// Body: JSON array of IDs
-        /// Example: [1, 2, 3, 4, 5]
+        /// Body: JSON array of PublicIds
+        /// Example: ["guid1", "guid2", "guid3"]
         /// 
         /// Returns: 200 OK with count of deleted records
         /// </summary>
         [HttpDelete("batch")]
         [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteManyExamples(
-            [FromBody] int[] ids,
+            [FromBody] Guid[] publicIds,
             CancellationToken cancellationToken)
         {
-            var command = new DeleteManyExamplesCommand(ids);
+            var command = new DeleteManyExamplesCommand(publicIds);
             var result = await _mediator.Send(command, cancellationToken);
             return result.ToActionResult();
         }

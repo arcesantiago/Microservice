@@ -16,6 +16,7 @@ namespace Microservice.Domain.Entities
 
             Name = name.Trim();
             Description = description?.Trim();
+            PublicId = Guid.NewGuid();
             CreatedAt = DateTimeOffset.UtcNow;
             UpdatedAt = DateTimeOffset.UtcNow;
         }

@@ -13,6 +13,7 @@ namespace Microservice.Infrastructure.Persistence
         {
             modelBuilder.Entity<Example>(entity =>
             {
+                entity.HasIndex(e => e.PublicId).IsUnique();
                 entity.Property(e => e.Name)
                     .HasMaxLength(200)
                     .IsRequired();
