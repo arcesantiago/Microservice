@@ -20,9 +20,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+        // v1.0 - Current stable version
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1.0 (Stable)");
+        
+        // v2.0 - Enhanced version
+        c.SwaggerEndpoint("/swagger/v2/swagger.json", "API v2.0 (Preview)");
+        
         c.RoutePrefix = string.Empty;
         c.DisplayRequestDuration();
+        
+        // Add version selector dropdown
+        c.ConfigObject.AdditionalItems["showExtensions"] = true;
+        c.ConfigObject.AdditionalItems["showCommonExtensions"] = true;
     });
 }
 

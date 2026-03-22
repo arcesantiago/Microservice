@@ -22,11 +22,12 @@ using Microservice.Application.Features.Examples.Queries.GetExamplesWithProjecti
 using Microservice.Application.Features.Examples.Queries.GetExampleWithProjection;
 using Microservice.Application.Models;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace Microservice.API.Controllers
 {
     /// <summary>
-    /// Examples API Controller
+    /// Examples API Controller v1.0
     /// 
     /// Use Case: REST API endpoints for CRUD and query operations
     /// 
@@ -34,6 +35,11 @@ namespace Microservice.API.Controllers
     /// - Commands: Create, Update, Delete
     /// - Queries: Get, Count, Exists
     /// - Advanced: ExecuteSql, ExecuteStoredProcedure, ExecuteInTransaction
+    /// 
+    /// Versioning: Supports multiple versioning strategies
+    /// - URL Path: /api/v1/examples
+    /// - Query String: /api/examples?api-version=1.0
+    /// - Header: X-Version: 1.0
     /// 
     /// Error Handling: Uses Result Pattern with ToActionResult() extension
     /// - Success: Returns data with appropriate HTTP status
@@ -45,9 +51,11 @@ namespace Microservice.API.Controllers
     /// - Raw SQL and stored procedure execution
     /// - Pagination support
     /// - Field projection for optimized responses
+    /// - API version reporting in headers
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     public class ExamplesController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
