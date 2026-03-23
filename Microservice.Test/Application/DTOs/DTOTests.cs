@@ -18,15 +18,12 @@ namespace Microservice.Test.Application.DTOs
             var updatedAt = DateTimeOffset.UtcNow;
 
             // Act
-            var dto = new GetExampleByIdDto
-            {
-                Id = id,
-                CreatedAt = createdAt,
-                UpdatedAt = updatedAt
-            };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", createdAt, updatedAt);
 
             // Assert
-            dto.Id.Should().Be(id);
+            dto.PublicId.Should().NotBe(Guid.Empty);
+            dto.Name.Should().Be("Test");
+            dto.Description.Should().Be("Description");
             dto.CreatedAt.Should().Be(createdAt);
             dto.UpdatedAt.Should().Be(updatedAt);
         }
@@ -35,14 +32,7 @@ namespace Microservice.Test.Application.DTOs
         public void DTO_ShouldInitializeNameAndDescription()
         {
             // Act
-            var dto = new GetExampleByIdDto
-            {
-                Id = 1,
-                Name = "Test",
-                Description = "Description",
-                CreatedAt = DateTimeOffset.UtcNow,
-                UpdatedAt = DateTimeOffset.UtcNow
-            };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             // Assert
             dto.Name.Should().Be("Test");
@@ -56,10 +46,10 @@ namespace Microservice.Test.Application.DTOs
         public void DTO_ShouldHandleDifferentIds(int id)
         {
             // Act
-            var dto = new GetExampleByIdDto { Id = id };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             // Assert
-            dto.Id.Should().Be(id);
+            dto.PublicId.Should().NotBe(Guid.Empty);
         }
 
         [Fact]
@@ -69,11 +59,7 @@ namespace Microservice.Test.Application.DTOs
             var now = DateTimeOffset.UtcNow;
 
             // Act
-            var dto = new GetExampleByIdDto
-            {
-                CreatedAt = now,
-                UpdatedAt = now.AddHours(1)
-            };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", now, now.AddHours(1));
 
             // Assert
             dto.CreatedAt.Should().Be(now);
@@ -88,11 +74,7 @@ namespace Microservice.Test.Application.DTOs
             var updatedAt = DateTimeOffset.UtcNow;
 
             // Act
-            var dto = new GetExampleByIdDto
-            {
-                CreatedAt = createdAt,
-                UpdatedAt = updatedAt
-            };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", createdAt, updatedAt);
 
             // Assert
             dto.CreatedAt.Should().BeBefore(dto.UpdatedAt);
@@ -110,15 +92,12 @@ namespace Microservice.Test.Application.DTOs
             var updatedAt = DateTimeOffset.UtcNow;
 
             // Act
-            var dto = new GetExampleByPredicateDto
-            {
-                Id = id,
-                CreatedAt = createdAt,
-                UpdatedAt = updatedAt
-            };
+            var dto = new GetExampleByPredicateDto(Guid.NewGuid(), "Test", "Description", createdAt, updatedAt);
 
             // Assert
-            dto.Id.Should().Be(id);
+            dto.PublicId.Should().NotBe(Guid.Empty);
+            dto.Name.Should().Be("Test");
+            dto.Description.Should().Be("Description");
             dto.CreatedAt.Should().Be(createdAt);
             dto.UpdatedAt.Should().Be(updatedAt);
         }
@@ -127,14 +106,7 @@ namespace Microservice.Test.Application.DTOs
         public void DTO_ShouldInitializeNameAndDescription()
         {
             // Act
-            var dto = new GetExampleByPredicateDto
-            {
-                Id = 1,
-                Name = "Test",
-                Description = "Description",
-                CreatedAt = DateTimeOffset.UtcNow,
-                UpdatedAt = DateTimeOffset.UtcNow
-            };
+            var dto = new GetExampleByPredicateDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             // Assert
             dto.Name.Should().Be("Test");
@@ -148,10 +120,10 @@ namespace Microservice.Test.Application.DTOs
         public void DTO_WithDifferentIds_ShouldStoreCorrectValue(int id)
         {
             // Act
-            var dto = new GetExampleByPredicateDto { Id = id };
+            var dto = new GetExampleByPredicateDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             // Assert
-            dto.Id.Should().Be(id);
+            dto.PublicId.Should().NotBe(Guid.Empty);
         }
     }
 
@@ -161,12 +133,11 @@ namespace Microservice.Test.Application.DTOs
         public void MultipleObjects_ShouldMaintainSeparateState()
         {
             // Arrange
-            var dto1 = new GetExampleByIdDto { Id = 1 };
-            var dto2 = new GetExampleByIdDto { Id = 2 };
+            var dto1 = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
+            var dto2 = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             // Act & Assert
-            dto1.Id.Should().Be(1);
-            dto2.Id.Should().Be(2);
+            dto1.PublicId.Should().NotBe(dto2.PublicId);
             dto1.Should().NotBe(dto2);
         }
 
@@ -177,17 +148,13 @@ namespace Microservice.Test.Application.DTOs
             var createdAt = DateTimeOffset.UtcNow;
 
             // Act
-            var dto = new GetExampleByIdDto
-            {
-                Id = 1,
-                CreatedAt = createdAt
-            };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", createdAt, createdAt);
 
-            var updatedDto = dto;
-            updatedDto.Id = 2;
+            // Since records are immutable, we create a new instance instead of modifying
+            var updatedDto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", createdAt, createdAt);
 
             // Assert
-            updatedDto.Id.Should().Be(2);
+            updatedDto.PublicId.Should().NotBe(dto.PublicId);
         }
     }
 }

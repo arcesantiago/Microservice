@@ -94,7 +94,7 @@ namespace Microservice.Test.API.Controllers
             _mockMediator
                 .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result<GetExampleByPredicateDto>.Success(
-                    new GetExampleByPredicateDto { Id = 1, PublicId = publicId }));
+                    new GetExampleByPredicateDto(publicId, "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow)));
 
             // Act
             var result = await _controller.GetExampleById(publicId, CancellationToken.None);
@@ -115,7 +115,7 @@ namespace Microservice.Test.API.Controllers
             _mockMediator
                 .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result<GetExampleByPredicateDto>.Success(
-                    new GetExampleByPredicateDto { Id = 1, PublicId = publicId }));
+                    new GetExampleByPredicateDto(publicId, "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow)));
 
             // Act
             await _controller.GetExampleById(publicId, CancellationToken.None);
@@ -156,7 +156,7 @@ namespace Microservice.Test.API.Controllers
             _mockMediator
                 .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Result<GetExampleByPredicateDto>.Success(
-                    new GetExampleByPredicateDto { Id = 1, PublicId = publicId }));
+                    new GetExampleByPredicateDto(publicId, "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow)));
 
             // Act
             await _controller.GetExampleById(publicId, CancellationToken.None);
@@ -197,7 +197,7 @@ namespace Microservice.Test.API.Controllers
             _mockMediator
                 .Setup(m => m.Send(It.IsAny<GetExampleByPredicateQuery>(), cancellationToken))
                 .ReturnsAsync(Result<GetExampleByPredicateDto>.Success(
-                    new GetExampleByPredicateDto { Id = 1, PublicId = publicId }));
+                    new GetExampleByPredicateDto(publicId, "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow)));
 
             // Act
             await _controller.GetExampleById(publicId, cancellationToken);

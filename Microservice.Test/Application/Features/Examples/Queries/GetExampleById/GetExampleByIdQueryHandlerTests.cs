@@ -33,7 +33,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
             // Arrange
             var query = new GetExampleByIdQuery(1);
             var example = new Example("Test", "Description") { Id = 1 };
-            var dto = new GetExampleByIdDto { Id = 1, CreatedAt = DateTimeOffset.UtcNow };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -87,7 +87,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
 
             _mockMapper
                 .Setup(m => m.Map<GetExampleByIdDto>(example))
-                .Returns(new GetExampleByIdDto { Id = 5 });
+                .Returns(new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
 
             // Act
             await _handler.Handle(query, CancellationToken.None);
@@ -102,7 +102,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
             // Arrange
             var query = new GetExampleByIdQuery(1);
             var example = new Example("Test", "Description") { Id = 1 };
-            var dto = new GetExampleByIdDto { Id = 1 };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))
@@ -128,7 +128,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
             // Arrange
             var query = new GetExampleByIdQuery(id);
             var example = new Example("Test", "Description") { Id = id };
-            var dto = new GetExampleByIdDto { Id = id };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(id, It.IsAny<CancellationToken>()))
@@ -143,7 +143,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            result.Value!.Id.Should().Be(id);
+            result.Value!.PublicId.Should().Be(dto.PublicId);
         }
 
         [Fact]
@@ -158,9 +158,11 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
                 .Setup(r => r.FindAsync(1, cancellationToken))
                 .ReturnsAsync(example);
 
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
+
             _mockMapper
                 .Setup(m => m.Map<GetExampleByIdDto>(example))
-                .Returns(new GetExampleByIdDto { Id = 1 });
+                .Returns(dto);
 
             // Act
             await _handler.Handle(query, cancellationToken);
@@ -226,12 +228,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleById
             var createdAt = DateTimeOffset.UtcNow.AddDays(-1);
             var updatedAt = DateTimeOffset.UtcNow;
             var example = new Example("Test", "Description") { Id = 1, CreatedAt = createdAt, UpdatedAt = updatedAt };
-            var dto = new GetExampleByIdDto
-            {
-                Id = 1,
-                CreatedAt = createdAt,
-                UpdatedAt = updatedAt
-            };
+            var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", createdAt, updatedAt);
 
             _mockReadRepository
                 .Setup(r => r.FindAsync(1, It.IsAny<CancellationToken>()))

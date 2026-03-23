@@ -33,7 +33,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
             // Arrange
             var query = new GetExampleByPredicateQuery(Guid.NewGuid());
             var example = new Example("Test", "Description");
-            var dto = new GetExampleByPredicateDto { Id = 1, PublicId = example.PublicId };
+            var dto = new GetExampleByPredicateDto(example.PublicId, "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -98,7 +98,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
 
             _mockMapper
                 .Setup(m => m.Map<GetExampleByPredicateDto>(example))
-                .Returns(new GetExampleByPredicateDto { Id = 1, PublicId = example.PublicId });
+                .Returns(new GetExampleByPredicateDto(example.PublicId, "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
 
             // Act
             await _handler.Handle(query, CancellationToken.None);
@@ -122,7 +122,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
             var query = new GetExampleByPredicateQuery(publicId);
             var example = new Example("Test", "Description");
             example.PublicId = publicId;
-            var dto = new GetExampleByPredicateDto { Id = 1, PublicId = publicId };
+            var dto = new GetExampleByPredicateDto(publicId, "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
 
             _mockReadRepository
                 .Setup(r => r.GetEntityAsync(
@@ -164,7 +164,7 @@ namespace Microservice.Test.Application.Features.Examples.Queries.GetExampleByPr
 
             _mockMapper
                 .Setup(m => m.Map<GetExampleByPredicateDto>(example))
-                .Returns(new GetExampleByPredicateDto { Id = 1, PublicId = example.PublicId });
+                .Returns(new GetExampleByPredicateDto(example.PublicId, "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
 
             // Act
             await _handler.Handle(query, cancellationToken);
