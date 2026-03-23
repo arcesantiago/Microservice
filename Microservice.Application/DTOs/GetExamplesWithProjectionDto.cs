@@ -1,10 +1,4 @@
 namespace Microservice.Application.DTOs
 {
-    public class GetExamplesWithProjectionDto
-    {
-        public int Id { get; set; }
-        public Guid PublicId { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string? Description { get; set; }
-    }
+    public record GetExamplesWithProjectionDto(Guid PublicId, string Name, string? Description);
 }

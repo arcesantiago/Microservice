@@ -47,13 +47,7 @@ namespace Microservice.Application.Features.Examples.Queries.GetExamplesWithProj
     {
         public async Task<Result<IEnumerable<GetExamplesWithProjectionDto>>> Handle(GetExamplesWithProjectionQuery request, CancellationToken cancellationToken)
         {
-            var data = await queryRepository.GetListAsync(x => new GetExamplesWithProjectionDto
-            {
-                Id = x.Id,
-                PublicId = x.PublicId,
-                Name = x.Name,
-                Description = x.Description
-            }, cancellationToken: cancellationToken);
+            var data = await queryRepository.GetListAsync(x => new GetExamplesWithProjectionDto(x.PublicId, x.Name, x.Description), cancellationToken: cancellationToken);
             return Result<IEnumerable<GetExamplesWithProjectionDto>>.Success(data);
         }
     }
