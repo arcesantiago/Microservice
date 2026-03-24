@@ -13,7 +13,6 @@ namespace Microservice.Test.Application.DTOs
         public void DTO_ShouldInitializeProperties()
         {
             // Arrange
-            var id = 1;
             var createdAt = DateTimeOffset.UtcNow;
             var updatedAt = DateTimeOffset.UtcNow;
 
@@ -39,11 +38,8 @@ namespace Microservice.Test.Application.DTOs
             dto.Description.Should().Be("Description");
         }
 
-        [Theory]
-        [InlineData(1)]
-        [InlineData(100)]
-        [InlineData(int.MaxValue)]
-        public void DTO_ShouldHandleDifferentIds(int id)
+        [Fact]
+        public void DTO_ShouldHandleDifferentIds()
         {
             // Act
             var dto = new GetExampleByIdDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
@@ -87,7 +83,6 @@ namespace Microservice.Test.Application.DTOs
         public void DTO_ShouldInitializeProperties()
         {
             // Arrange
-            var id = 1;
             var createdAt = DateTimeOffset.UtcNow;
             var updatedAt = DateTimeOffset.UtcNow;
 
@@ -113,11 +108,8 @@ namespace Microservice.Test.Application.DTOs
             dto.Description.Should().Be("Description");
         }
 
-        [Theory]
-        [InlineData(1)]
-        [InlineData(50)]
-        [InlineData(int.MaxValue)]
-        public void DTO_WithDifferentIds_ShouldStoreCorrectValue(int id)
+        [Fact]
+        public void DTO_WithDifferentIds_ShouldStoreCorrectValue()
         {
             // Act
             var dto = new GetExampleByPredicateDto(Guid.NewGuid(), "Test", "Description", DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);

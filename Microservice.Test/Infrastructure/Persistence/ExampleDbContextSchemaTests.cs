@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microservice.Domain.Entities;
 using Microservice.Infrastructure.Persistence;
+using Xunit;
 
 namespace Microservice.Test.Infrastructure.Persistence
 {
@@ -36,7 +37,7 @@ namespace Microservice.Test.Infrastructure.Persistence
             await using (connection)
             await using (var context = new ExampleDbContext(options))
             {
-                await context.Database.EnsureCreatedAsync();
+                await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var query = context.Examples!
                 .Select(e => new
@@ -49,7 +50,7 @@ namespace Microservice.Test.Infrastructure.Persistence
                     e.UpdatedAt
                 });
 
-                var result = await query.FirstOrDefaultAsync();
+                var result = await query.FirstOrDefaultAsync(TestContext.Current.CancellationToken);
                 result.Should().BeNull();
             }
         }
@@ -61,11 +62,11 @@ namespace Microservice.Test.Infrastructure.Persistence
             await using (connection)
             await using (var context = new ExampleDbContext(options))
             {
-                await context.Database.EnsureCreatedAsync();
+                await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var example = new Example("Test Name", "Test Description");
             context.Examples!.Add(example);
-            await context.SaveChangesAsync();
+                await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
             var read = await context.Examples
                 .AsNoTracking()
@@ -79,7 +80,7 @@ namespace Microservice.Test.Infrastructure.Persistence
                     e.CreatedAt,
                     e.UpdatedAt
                 })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(TestContext.Current.CancellationToken);
 
             read.Should().NotBeNull();
             read!.Id.Should().Be(example.Id);
@@ -96,7 +97,7 @@ namespace Microservice.Test.Infrastructure.Persistence
             await using (connection)
             await using (var context = new ExampleDbContext(options))
             {
-                await context.Database.EnsureCreatedAsync();
+                await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
 
             var entityType = context.Model.FindEntityType(typeof(Example));
             entityType.Should().NotBeNull();
@@ -162,7 +163,7 @@ namespace Microservice.Test.Infrastructure.Persistence
                     e.UpdatedAt
                 });
 
-            var result = await query.Take(1).ToListAsync();
+            var result = await query.Take(1).ToListAsync(TestContext.Current.CancellationToken);
             result.Should().NotBeNull();
         }
 

@@ -74,8 +74,8 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateExampleField
             }
             if (request.Description is not null)
             {
-                example.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
-                propertiesToUpdate.Add(x => x.Description);
+                example.Description = request.Description.Trim();
+                propertiesToUpdate.Add(x => x.Description!);
             }
 
             writeRepository.UpdateFields(example, [.. propertiesToUpdate]);

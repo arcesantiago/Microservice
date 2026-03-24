@@ -101,13 +101,13 @@ public class Result<T> : Result
     /// <summary>
     /// Create failed result with multiple errors
     /// </summary>
-    public static Result<T> Failure(List<Error> errors) 
+    public static new Result<T> Failure(List<Error> errors) 
         => new(false, errors: errors);
 
     /// <summary>
     /// Create failed result from validation failures
     /// </summary>
-    public static Result<T> FailureFromValidation(List<string> messages)
+    public static new Result<T> FailureFromValidation(List<string> messages)
     {
         var errors = messages.Select(m => Error.Validation(m)).ToList();
         return new(false, errors: errors);

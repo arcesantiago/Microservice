@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microservice.Infrastructure.Cache;
 using Microsoft.Extensions.Caching.Memory;
+using Xunit;
 
 namespace Microservice.Test.Infrastructure.Cache
 {
@@ -85,7 +86,7 @@ namespace Microservice.Test.Infrastructure.Cache
 
             // Act
             await _cacheService.SetAsync(key, value, ttl);
-            await Task.Delay(150); // Esperar a que expire
+            await Task.Delay(150, TestContext.Current.CancellationToken); // Esperar a que expire
 
             // Assert
             var result = await _cacheService.GetAsync<string>(key);
