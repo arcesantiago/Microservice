@@ -45,7 +45,7 @@ namespace Microservice.Application.Features.Examples.Queries.GetExampleByPredica
         {
             var example = await readRepository.GetEntityAsync(x => x.PublicId == request.PublicId, cancellationToken: cancellationToken);
 
-            if (example == null)
+            if (example is null)
                 return Result<GetExampleByPredicateDto>.Failure(Error.NotFound("Ejemplo no encontrado"));
 
             return Result<GetExampleByPredicateDto>.Success(mapper.Map<GetExampleByPredicateDto>(example));

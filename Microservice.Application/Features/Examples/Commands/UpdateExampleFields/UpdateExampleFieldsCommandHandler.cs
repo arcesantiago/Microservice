@@ -62,7 +62,7 @@ namespace Microservice.Application.Features.Examples.Commands.UpdateExampleField
         {
             var example = await readRepository.GetEntityAsync(x => x.PublicId == request.PublicId, cancellationToken: cancellationToken);
 
-            if (example == null)
+            if (example is null)
                 return Result<Guid>.Failure(Error.NotFound($"Ejemplo con publicId {request.PublicId} no encontrado"));
 
             var propertiesToUpdate = new List<Expression<Func<Example, object>>>();

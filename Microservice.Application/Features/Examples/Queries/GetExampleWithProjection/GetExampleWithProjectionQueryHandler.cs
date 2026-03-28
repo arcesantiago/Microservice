@@ -48,12 +48,12 @@ namespace Microservice.Application.Features.Examples.Queries.GetExampleWithProje
     {
         public async Task<Result<GetExampleWithProjectionDto>> Handle(GetExampleWithProjectionQuery request, CancellationToken cancellationToken)
         {
-            var data = await queryRepository.GetEntityAsync(x => new GetExampleWithProjectionDto(x.PublicId, x.Name, x.Description), x => x.PublicId == request.PublicId, cancellationToken);
+            var result = await queryRepository.GetEntityAsync(x => new GetExampleWithProjectionDto(x.PublicId, x.Name, x.Description), x => x.PublicId == request.PublicId, cancellationToken);
             
-            if (data == null)
+            if (result is null)
                 return Result<GetExampleWithProjectionDto>.Failure(Error.NotFound("Ejemplo no encontrado"));
             
-            return Result<GetExampleWithProjectionDto>.Success(data);
+            return Result<GetExampleWithProjectionDto>.Success(result);
         }
     }
 }
