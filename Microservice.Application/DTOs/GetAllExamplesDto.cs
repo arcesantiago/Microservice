@@ -1,6 +1,4 @@
-﻿namespace Microservice.Application.DTOs
+namespace Microservice.Application.DTOs
 {
-    public class GetAllExamplesDto
-    {
-    }
+    public record GetAllExamplesDto(Guid PublicId, string Name, string? Description, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt);
 }

@@ -1,26 +1,40 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microservice.Application.Contracts.Persistence;
+using Microservice.Application.Common.Results;
+using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Application.DTOs;
+using Microservice.Domain.Entities;
 
 namespace Microservice.Application.Features.Examples.Queries.GetAllExample
 {
+    /// <summary>
+    /// Use Case: Retrieve all Example records from the database.
+    /// 
+    /// When to use:
+    /// - When a GET request is made to fetch all resources without filters
+    /// - When AI agents need to analyze the complete dataset
+    /// - When exporting or synchronizing data across systems
+    /// - For dashboard operations that require an overview of all records
+    /// 
+    /// Responsibilities:
+    /// - Query all entities from the read repository
+    /// - Project entities to DTOs for API response
+    /// - Handle mapping and data transformation
+    /// 
+    /// Performance Considerations:
+    /// - For large datasets, consider using GetExamplesPaginatedQueryHandler instead
+    /// - Implement caching via ICacheableQuery interface if applicable
+    /// - AI agents analyzing patterns may benefit from cached results
+    /// </summary>
     public class GetAllExamplesQueryHandler(
-        IExampleRepository appointmentRepository,
-        IMapper mapper) : IRequestHandler<GetAllExamplesQuery, IEnumerable<GetAllExamplesDto>>
+        IReadRepository<Example> readRepository,
+        IMapper mapper
+        ) : IRequestHandler<GetAllExamplesQuery, Result<IEnumerable<GetAllExamplesDto>>>
     {
-        private readonly IExampleRepository _exampleRepository = appointmentRepository;
-        private readonly IMapper _mapper = mapper;
-        public async Task<IEnumerable<GetAllExamplesDto>> Handle(GetAllExamplesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<GetAllExamplesDto>>> Handle(GetAllExamplesQuery request, CancellationToken cancellationToken)
         {
-            return _mapper.Map<IEnumerable<GetAllExamplesDto>>(await _exampleRepository.GetListAsync(cancellationToken: cancellationToken));
-
-            //otra variante utilizando select
-            return [.. await _exampleRepository.GetListAsync(
-                select: x => new GetAllExamplesDto
-                {
-                }
-                ,cancellationToken: cancellationToken)];
+            var data = mapper.Map<IEnumerable<GetAllExamplesDto>>(await readRepository.GetListAsync(cancellationToken: cancellationToken));
+            return Result<IEnumerable<GetAllExamplesDto>>.Success(data);
         }
     }
 }

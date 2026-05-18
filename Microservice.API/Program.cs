@@ -1,16 +1,18 @@
 using Microservice.API;
-using Microservice.API.Middleware;
 using Microservice.Application;
 using Microservice.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Registrar servicios de aplicaci�n e infraestructura
+// Registrar servicios de aplicación e infraestructura
 builder.Services.AddApiServices(builder.Configuration, builder.Environment);
-builder.Services.AddAplicationServices();
+builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
+
+// Add exception handling middleware (Modern .NET 10 approach using IExceptionHandler)
+app.UseExceptionHandler(_ => { });
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -18,15 +20,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+        // v1.0 - Current stable version
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1.0 (Stable)");
+        
+        // v2.0 - Enhanced version
+        c.SwaggerEndpoint("/swagger/v2/swagger.json", "API v2.0 (Preview)");
+        
         c.RoutePrefix = string.Empty;
         c.DisplayRequestDuration();
+        
+        // Add version selector dropdown
+        c.ConfigObject.AdditionalItems["showExtensions"] = true;
+        c.ConfigObject.AdditionalItems["showCommonExtensions"] = true;
     });
 }
 
 //using (var scope = app.Services.CreateScope())
 //{
-//    var db = scope.ServiceProvider.GetRequiredService<DbContext>();
+//    var db = scope.ServiceProvider.GetRequiredService<ExampleDbContext>();
 
 //    if (builder.Environment.IsDevelopment() || builder.Environment.EnvironmentName == "Testing")
 //    {
@@ -36,12 +47,12 @@ if (app.Environment.IsDevelopment())
 //    else
 //        await db.Database.MigrateAsync();
 
-//    DbInitializer.Seed(db);
+//    //DbInitializer.Seed(db);
 //}
 
 app.UseCors("DefaultCors");
-app.UseMiddleware<ExceptionMiddleware>();
-app.MapHealthChecks("/health");
+
+//app.MapHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

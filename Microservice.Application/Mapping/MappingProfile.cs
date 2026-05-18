@@ -1,5 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microservice.Application.DTOs;
+using Microservice.Application.Features.Examples.Commands.CreateExample;
 using Microservice.Domain.Entities;
 
 namespace Microservice.Application.Mapping
@@ -9,8 +10,17 @@ namespace Microservice.Application.Mapping
         public MappingProfile()
         {
 
-            CreateMap<CreateExampleDto, Example>()
-                .ConstructUsing(src => new Example(src.Id));
+            CreateMap<CreateExampleCommand, Example>()
+                .ConstructUsing(src => new Example(src.Name, src.Description));
+
+            CreateMap<Example, GetExampleByIdDto>();
+            CreateMap<Example, GetExampleByPredicateDto>();
+            CreateMap<Example, GetAllExamplesDto>();
+            CreateMap<Example, GetExamplesFromSqlDto>();
+            CreateMap<Example, GetExamplesPaginatedDto>();
+            CreateMap<Example, GetExamplesWithProjectionDto>();
+            CreateMap<Example, GetExampleWithProjectionDto>();
+            CreateMap<Example, ExecuteSqlWithResultDto>();
         }
     }
 }

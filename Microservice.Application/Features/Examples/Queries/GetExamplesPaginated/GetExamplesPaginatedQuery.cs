@@ -1,4 +1,5 @@
 using MediatR;
+using Microservice.Application.Common.Results;
 using Microservice.Application.DTOs;
 using Microservice.Application.Models;
 
@@ -7,5 +8,5 @@ namespace Microservice.Application.Features.Examples.Queries.GetExamplesPaginate
     public record GetExamplesPaginatedQuery(
         int CurrentPage,
         int PageSize
-    ) : IRequest<PagedResult<GetExamplesPaginatedDto>>;
+    ) : IRequest<Result<PagedResult<GetExamplesPaginatedDto>>>;
 }

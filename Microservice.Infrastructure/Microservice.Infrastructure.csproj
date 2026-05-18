@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Microservice.Application\Microservice.Application.csproj" />
-    <ProjectReference Include="..\Microservice.Application\Microservice.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,4 @@
 namespace Microservice.Application.DTOs
 {
-    public class GetExamplesPaginatedDto
-    {
-        public int Id { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset? UpdatedAt { get; set; }
-    }
+    public record GetExamplesPaginatedDto(Guid PublicId, string Name, string? Description, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt);
 }
