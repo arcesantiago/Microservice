@@ -1,8 +1,10 @@
 ﻿using Microservice.Application.Contracts.Infrastructure;
 using Microservice.Application.Contracts.Persistence;
+using Microservice.Application.Contracts.Persistence.Dapper;
 using Microservice.Application.Contracts.Persistence.EF;
 using Microservice.Infrastructure.Cache;
 using Microservice.Infrastructure.Persistence;
+using Microservice.Infrastructure.Repositories.Dapper;
 using Microservice.Infrastructure.Repositories.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +39,13 @@ namespace Microservice.Infrastructure
             services.AddScoped(typeof(ISqlQueryRepository<>), typeof(SqlRepository<>));
             services.AddScoped(typeof(ISqlCommandRepository<>), typeof(SqlRepository<>));
             services.AddScoped(typeof(ISqlRepository<>), typeof(SqlRepository<>));
+
+            // Dapper Repositories
+            services.AddScoped(typeof(IDapperReadRepository<>), typeof(DapperRepository<>));
+            services.AddScoped(typeof(IDapperWriteRepository<>), typeof(DapperRepository<>));
+
+            services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
+
 
             // Custom repositories / UnitOfWork
             services.AddScoped<IUnitOfWork>(sp =>
